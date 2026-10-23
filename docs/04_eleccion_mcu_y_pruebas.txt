@@ -1,0 +1,29 @@
+NOTA TÉCNICA BREVE - ELECCIÓN DEL MICROCONTROLADOR
+Proyecto Linux 2 / uCuPViewer | 23/10/2026 | Estado: recomendación provisional
+
+REQUERIMIENTO. Capturar dos canales analógicos en ventanas de al menos 64 muestras, tres presets (100, 1.000 y 10.000 Sa/s), intercambio de frecuencia por SPI con Raspberry Pi; bonificación si la captura de >=40.000 Sa/s se verifica experimentalmente. La web corre en el SBC, no en el MCU.
+
+STM32L432KC. Cortex-M4 a 80 MHz, 64 KB SRAM, 256 KB Flash, un ADC de 12 bits con conversión máxima nominal del orden de 5 Msps, temporizadores, DMA y dos SPI. Se propone disparar con TIM el escaneo secuencial de CH1/CH2 y guardar en DMA. Ventaja: temporización directamente controlada por periféricos y amplio margen nominal a 40 kSa/s POR CANAL (80 kconv/s para dos canales). Límite: muestras CH1/CH2 no simultáneas; medición del desfase y del tiempo real de adquisición obligatoria.
+
+ESP32-S3. Dos núcleos hasta 240 MHz, memoria considerablemente mayor, ADC de 12 bits y SPI como periférico con DMA. Tiene adquisición ADC continua multicanal. Sin embargo, Espressif documenta que ADC2 DMA no es estable/soportado: se recomienda usar dos canales de ADC1 secuencialmente. El HAL oficial define para el controlador continuo un límite superior de 83.333 conversiones/s y mínimo de 611 conversiones/s (pueden depender de versión/implementación); 40 kSa/s por canal equivalen a 80.000 conversiones/s, cerca del máximo. Para el preset de 100 Sa/s por canal, habría que estudiar decimación o modo alternativo. ESP32-S3 soporta SPI slave, aunque la preparación de transacciones puede introducir latencia. No asumir sin ensayos una precisión analógica o jitter determinados.
+
+CONCLUSIÓN. Se recomienda STM32L432KC como MCU principal para el primer prototipo, pues permite una adquisición temporizada de dos canales con margen teórico y sin depender de Wi-Fi/BLE. ESP32-S3 sigue siendo alternativa legítima, no descartada experimentalmente. Esta es una preferencia de ingeniería, NO una prueba de rendimiento absoluto ni garantía de bonificación. La elección física se confirma tras los ensayos de abajo y la disponibilidad real de tarjetas/pines.
+
+ENSAYOS MÍNIMOS COMPARABLES EN AMBOS MCU (Checho + firmware + hardware):
+E1: 64 pares por ventana a 100, 1.000, 10.000 Sa/s; registrar N, frecuencia medida, método y señales utilizadas.
+E2: repetir a 40.000 Sa/s por canal si configuración lo permite; medir continuidad, pérdidas y desfase CH1/CH2; si falla documentar límite alcanzado.
+E3: introducir señal DC y senoide conocida en ambos canales: medir promedio, ruido, amplitud y repetibilidad sin afirmar calibración sin patrón.
+E4: medir con osciloscopio o analizador lógico el intervalo entre eventos de muestreo usando un GPIO marcador; el marcador mide la temporización del firmware, no necesariamente el instante interno exacto de conversión ADC.
+E5: transmitir 256 bytes de muestras + cabecera/CRC por SPI en 1,2,4,8 MHz escalonadamente; medir tiempo completo, integridad, errores y velocidad real; comparar con el máximo nominal de las hojas de datos del MCU y de la Raspberry Pi concreta.
+E6: 100 ventanas consecutivas por preset y 5 cambios de frecuencia; verificar que no haya mezclas ni resultados obsoletos.
+
+FÓRMULAS. Ventana mínima: 64 pares × 2 canales × 16 bits = 2048 bits = 256 B; a 1 MHz, transmisión ideal payload = 2,048 ms (sin overhead). Para flujo continuo 40.000 Sa/s/canal, caudal solo de payload = 40.000×2×16 = 1,28 Mbit/s. La duración de ventana de 64 muestras es 64/fs (0,640 s a 100 Sa/s; 0,064 s a 1.000; 0,0064 s a 10.000; 0,0016 s a 40.000). Distinguir captura por ventanas de streaming continuo.
+
+FUENTES PRIMARIAS:
+- ST, STM32L432KC datasheet: https://www.st.com/resource/en/datasheet/stm32l432kc.pdf
+- ST, NUCLEO-L432KC: https://www.st.com/en/evaluation-tools/nucleo-l432kc.html
+- Espressif, ESP32-S3 ADC continuous: https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/adc/adc_continuous.html
+- Espressif, limitaciones del controlador ADC (HAL): https://github.com/espressif/esp-idf/blob/master/components/esp_hal_ana_conv/esp32s3/include/hal/adc_ll.h
+- Espressif, SPI slave: https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/spi_slave.html
+
+ABIERTO. Modelo exacto Raspberry Pi y placa ESP32-S3; hoja de datos de placa, pinout efectivo, alimentación, máximos SPI conjuntos y versión de ESP-IDF.

@@ -1,0 +1,49 @@
+CONTRATOS DE INTERFAZ Y DATOS - BORRADOR 0.1
+ESTADO: PROPUESTA DE NEGOCIACIÓN. NO SE CONSIDERA CONGELADA HASTA APROBACIÓN POR EQUIPO Y PRUEBA SPI ENTRE SBC/MCU.
+
+A. CONDICIONES DEL SISTEMA
+- Dos señales analógicas independientes CH1 y CH2; al menos 64 muestras por canal en una ventana (interpretación adoptada para asegurar el mínimo exigido).
+- `sample_rate_hz` significa muestras POR CANAL por segundo. Para ADC multiplexado, cada disparo provoca CH1 y CH2 secuenciales, no simultáneos; caracterizar el desfase.
+- Valores inicialmente ADC RAW de 12 bits (0..4095) almacenados en uint16_t. Evitar confundir valor raw con voltaje real calibrado.
+- Presets 100, 1000 y 10000 Sa/s; 40000 Sa/s se habilita solo tras demostrar estabilidad y dentro de límites de hardware.
+- Una ventana mínima contiene 64 pares intercalados [CH1_0,CH2_0,CH1_1,CH2_1,...], total 128 uint16 = 256 bytes en little endian.
+- Transferir una ventana completa sin que DMA sobrescriba lo leído; usar dos buffers/snapshot o pausar escritura mientras se copia al buffer TX. Definir política de nuevas capturas: preferencia reemplazar última ventana con secuencia y contador de pérdidas; NO mezclar bytes de ventanas distintas.
+
+B. SPI ENTRE SBC Y MCU (PROPUESTA TÉCNICA)
+- Raspberry Pi: controlador/master SPI. MCU: periférico/slave.
+- Modo 0 (CPOL=0, CPHA=0), MSB-first, 8 bits, CS activo en bajo; SCLK inicial 1 MHz (NO valor máximo demostrado). Todos los GPIO 3,3 V; tierra compartida.
+- Operación por solicitud del SBC (no streaming continuo obligatorio). Transacciones separadas para enviar comando, recibir estado y recibir ventana; el MCU debe preparar TX antes de que el SBC genere clocks.
+- Opcional RECOMENDADO: línea GPIO READY/IRQ del MCU hacia la Pi para evitar leer cuando aún no está preparado. Si no se utiliza, aplicar polling de estado con timeout e intervalos definidos por ensayo.
+- Acordar medición de retardo entre transacciones y velocidad SPI estable; no presumir que 60 MHz en MCU garantizan lo mismo en Raspberry Pi.
+- Comandos lógicos mínimos: PING, SET_PRESET(preset_id), START_CAPTURE, GET_STATUS, READ_WINDOW. Respuestas: OK, BUSY, BAD_CMD, BAD_CRC, NO_WINDOW y OVERRUN.
+- Asociar un `sequence_id` a solicitud/respuesta; descartar paquetes con longitud/ID/CRC incorrectos y repetir si el comando es idempotente.
+
+B1. FORMATO DE TRAMA CANDIDATO (separación de lecturas por validar con hardware)
+CMD de 8 bytes: [0]=0xA5; [1]=opcode; [2]=argumento/preset; [3]=seq; [4..5]=reservado(0); [6..7]=CRC-16/CCITT-FALSE little-endian de bytes 0..5.
+OPCODE: 0x01 PING; 0x02 SET_PRESET; 0x03 START_CAPTURE; 0x04 GET_STATUS; 0x05 READ_WINDOW.
+Preset IDs: 0=100; 1=1000; 2=10000; 3=40000 (solo habilitar tras verificación).
+ACK candidato, 8 bytes: [0]=0x5A; [1]=status; [2]=opcode eco; [3]=seq eco; [4..5]=información opcional; [6..7]=CRC16 de bytes 0..5.
+READ_WINDOW: después de ACK=OK y de que el MCU prepare TX, clock de 268 bytes: [0]=0x5A, [1]=status=0, [2]=seq, [3]=preset_id, [4..5]=64 (uint16 LE), [6..7]=256 (uint16 LE), [8..263]=payload intercalado, [264..265]=CRC16 de bytes 0..263, [266..267]=padding(0). Longitud 268 (alineación múltiplo de 4, útil en ESP32 con DMA).
+ADVERTENCIA: el intercambio comando/ACK/READ requiere una máquina de estados del periférico SPI y pruebas de CS, DMA y tiempos entre transacciones. Esta propuesta de bytes aún NO está comprobada; no implementarla en paralelo sin revisión técnica.
+
+C. BACKEND LINUX ↔ FRONTEND (API HTTP / JSON PROPUESTA)
+GET /api/v1/status -> {"connected":true,"capture_status":"ready","sample_rate_hz":1000,"mcu":"stm32l432kc","source":"hardware"}
+POST /api/v1/acquisition/preset con {"sample_rate_hz":1000} -> 200 {"sample_rate_hz":1000,"applied":true} al confirmar ACK real del MCU. Si falla, HTTP 503/504 o 422 con mensaje de error, nunca fingir éxito.
+GET /api/v1/window/latest -> ejemplo:
+{
+  "window_id": 1,
+  "source": "simulated",
+  "sample_rate_hz": 1000,
+  "samples_per_channel": 64,
+  "adc_resolution_bits": 12,
+  "unit": "adc_counts",
+  "channels": {"ch1": [0, 1], "ch2": [3, 4]}
+}
+Nota: los arrays del ejemplo ilustran estructura solamente; una respuesta real DEBE contener exactamente 64 valores en cada canal (o declarar explícitamente el N real >=64), sin puntos omitidos. El eje X se deriva de t_i=i/sample_rate_hz. Etiquetar la fuente SIMULATED hasta disponer de hardware real.
+- El servidor Nginx/Apache sirve HTML/CSS/JS y enruta /api/ al backend; no se permite exponer un servidor de desarrollo como sustituto de Nginx/Apache.
+- El cliente refresca entre 1 y 4 segundos (0,25–1 Hz), sin depender de que el ADC capture a esa frecuencia. Evitar solicitudes solapadas y mostrar error de pérdida de conexión.
+
+D. VERSIONADO / CONVERGENCIA
+- Contrato editable solo por PR con visto bueno de firmware, backend, frontend y QA; doc actualizado en el mismo PR.
+- Primero usar simuladores y pruebas de contrato, después activar hardware; un mock no cuenta como evidencia de medición real.
+- Pendientes obligatorios antes de congelar v1: modelo concreto de Raspberry Pi, placa STM32/ESP32 y pines, obligación o no de copiar la lógica de frame del profesor, topología del backend, temporización de captura y espaciado SPI, decisión READY, política timeout/retry, valor de N final, estrategia de parada ordenada.

@@ -1,0 +1,47 @@
+ROLES Y RESPONSABILIDADES - PROPUESTA V0.1
+Equipo: seis integrantes | Estatus: asignación propuesta, sujeta a aceptación del equipo.
+
+PRINCIPIOS
+- Una persona responsable final por subsistema, otras pueden colaborar. Quien prueba NO modifica evidencias de otra persona.
+- Cada entrega debe tener commit/PR, instrucciones de ejecución, evidencia y prueba de aceptación.
+- Los roles no son créditos automáticos: la declaración final registrará la participación realmente realizada.
+- Los cambios de contrato SPI/HTTP requieren revisión coordinada, no modificaciones aisladas.
+
+1. COORDINACIÓN + FIRMWARE STM32 - Tú
+Responsabilidades: crear y organizar repositorio/issues, priorizar tareas y revisar integración; desarrollar firmware STM32L432KC con ADC en secuencia de dos canales, temporizador, DMA y buffer de 64 pares; comandos SPI para presets 100/1.000/10.000 Sa/s; apoyo en prueba de 40.000 Sa/s; errores y estados. Coordinar interoperabilidad con Pipe y Ferxxo.
+Entregables: firmware compilable e instalable, configuración del reloj/periféricos, README de flashing, pruebas de buffer y presets, registros de aportes, PR revisados.
+Aceptación: dos canales con 64 valores, periodos medidos según preset, transición de presets controlada por SPI, ventana válida disponible sin mezclar capturas.
+
+2. HARDWARE - Valeria
+Responsabilidades: diagramas, señales de entrada dentro del rango permitido, GND común, lógica SPI 3,3 V, cableado, condensadores/antialias cuando correspondan, puntos de medida y elección documentada de pines libres; comparación física MCU A/B.
+Entregables: pinout verificado de Raspberry Pi/STM32/ESP32, fotos, diagrama, checklist eléctrico, registro de fuentes de señales y valores.
+Aceptación: sin conflictos de alimentación/pines, señales de prueba seguras y repetibles, evidencia de la amplitud medida en terminales del ADC.
+
+3. QA / ENSAYOS - Checho
+Responsabilidades: redactar matriz y metodología antes de integrar, casos normales/borde/fallo, mediciones con instrumentos, evidencias originales, comparar MCU, ejecutar integración con cada dueño de módulo; calcular SPI teórico y medido junto con Ferxxo.
+Entregables: plan y matriz de verificación, pruebas unitarias en SBC/MCU, pruebas de integración, resultados PASS/FAIL con fecha/equipo/versión y capturas/CSV.
+Aceptación: cada requisito trazado a al menos una prueba y evidencia; ninguna conclusión «cumple» sin medida.
+
+4. FRONTEND - Mateo
+Responsabilidades: dashboard de dos canales con amplitud vs tiempo, selector de presets, actualización HTTP cada 1–4 s, estados READY/BUSY/ERROR, señalización de desconexión y fallas; mock API mientras no haya hardware.
+Entregables: frontend con instrucciones, pruebas de actualización, capturas y demo con valores simulados etiquetados como SIMULATED.
+Aceptación: dos curvas, cambio de frecuencia mediante API, interfaz accesible en la red a través del servidor HTTP y refresco dentro de límites.
+
+5. BACKEND SBC - Pipe
+Responsabilidades: proceso usuario en Raspberry Pi que controla SPI, serializa/deserializa ventanas, valida trama/CRC, conserva latest-window sin mezclar generaciones y presenta API HTTP local compatible con frontend; mocks de MCU y pruebas unitarias; analizar cómo aprovechar el patrón DAQ del docente.
+Entregables: servicio backend ejecutable, contrato API, pruebas de parser y de transacciones, logs y guía de puesta en marcha.
+Aceptación: GET devuelve exactamente dos canales de N muestras, errores explícitos, preset POST genera instrucción SPI y funciona con fake SPI sin MCU.
+
+6. INFRAESTRUCTURA LINUX / SPI - Ferxxo
+Responsabilidades: habilitar SPI en la Raspberry Pi, revisar pinout/CS/clock con Valeria, configurar Nginx o Apache, proxy hacia backend, systemd, scripts de instalación, red local, pruebas de tasas SPI y soporte a las transacciones con el firmware.
+Entregables: instrucciones reproducibles y scripts, servicio HTTP en red, medición de SCLK/configuración SPI, evidencia de arranque de servicios y reinicio.
+Aceptación: despliegue repetible en Pi limpia documentada; página accesible por HTTP; transferencia SPI estable a velocidades registradas.
+
+COLABORACIONES PRIORITARIAS
+- Tú + Pipe + Ferxxo: contrato SPI y manejo de errores.
+- Valeria + Tú + Checho: adquisición analógica y medición de tasas reales.
+- Mateo + Pipe: contrato JSON de API y mocks.
+- Checho + TODOS: evidencias/actas de resultados.
+
+SECUENCIA DE APROBACIÓN
+Primero interfaces y pruebas con mocks, luego unitarias sobre hardware, integración SPI, integración HTTP, mediciones finales y video. El usuario coordina PR y no debe asumir la autoría de las pruebas de sus compañeros.

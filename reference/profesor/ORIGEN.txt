@@ -1,0 +1,4 @@
+Los archivos de esta carpeta provienen de uCuPViewer.zip suministrado por el profesor, sin modificaciones de contenido.
+Se conservaron los fuentes C/C++/Rust y diagrama, pero se excluyeron .git, binarios y resultados de compilación para que no contaminen el repositorio del equipo.
+NO equivalen a la implementación terminada del proyecto Linux 2. Revisar docs/01_revision_esqueleto_profesor.txt.
+Antes de publicar en repositorio público, confirmar con el docente el permiso para redistribuir estos archivos.

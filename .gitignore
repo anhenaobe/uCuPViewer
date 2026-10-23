@@ -1,0 +1,25 @@
+# Compilación
+build/
+**/build/
+**/target/
+*.o
+*.d
+*.elf
+*.bin
+*.hex
+*.map
+*.exe
+# IDE/editor
+.vscode/
+.idea/
+.DS_Store
+# Datos/secretos
+.env
+.env.*
+*.key
+*.pem
+__pycache__/
+.pytest_cache/
+# logs/artifacts volátiles
+*.log
+*.tmp

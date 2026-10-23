@@ -1,0 +1,25 @@
+REGISTRO DE APORTES Y USO DE IA - PLANTILLAS (NO SON DECLARACIONES DE TRABAJO YA REALIZADO)
+
+APORTES POR PARTICIPANTE (una entrada al cierre de cada tarea):
+- Persona / usuario GitHub:
+- Rol inicial / rol realmente ejecutado:
+- Tareas e Issues realizados:
+- Archivos/commits/PR asociados:
+- Ensayos efectuados personalmente y evidencia:
+- Aporte de terceros revisado:
+- Obstáculos, pendientes y límites:
+
+USO DE IA POR INTERACCIÓN (registrar DURANTE EL PROYECTO):
+- Fecha y participante:
+- Modelo / herramienta utilizada:
+- Tarea para la que se usó:
+- Prompt/chat/enlace o exportación del contenido de interacción:
+- Archivos o decisiones influenciadas:
+- Qué se copió/adaptó/descartó:
+- Cómo se verificó (lectura manual, compilación, prueba unitaria, medición, revisión por compañero):
+- Responsable humano que aprobó:
+
+INICIO DE REGISTRO:
+- 2026-10-23: ChatGPT (GPT-6), asistencia en revisión del ZIP del profesor, comparación STM32L432KC vs ESP32-S3, propuesta de contratos/roles/matriz, preparación de estructura. Verificación: cotejo de especificaciones con documentación oficial; revisión de fuentes del ZIP; NO se han ejecutado mediciones sobre tarjetas físicas y no se ha probado implementación integrada. Guardar exportación/contenido de esta conversación según exigencia del docente.
+
+ADVERTENCIA: el contenido del ZIP del profesor es referencia ajena. No atribuirlo como implementación original de integrantes. El informe final debe distinguir sugerencias de IA, código propio, código del profesor y verificaciones reales.
