@@ -1,29 +1,36 @@
-NOTA TÉCNICA BREVE - ELECCIÓN DEL MICROCONTROLADOR
-Proyecto Linux 2 / uCuPViewer | 23/10/2026 | Estado: recomendación provisional
+DECISIÓN TÉCNICA INICIAL - STM32L432KC Y PLATFORMIO | 2026-10-29
+Estado: plataforma seleccionada; rendimiento pendiente de ensayos físicos.
 
-REQUERIMIENTO. Capturar dos canales analógicos en ventanas de al menos 64 muestras, tres presets (100, 1.000 y 10.000 Sa/s), intercambio de frecuencia por SPI con Raspberry Pi; bonificación si la captura de >=40.000 Sa/s se verifica experimentalmente. La web corre en el SBC, no en el MCU.
+1. DECISIÓN Y COMPARACIÓN HISTÓRICA
+Se selecciona STM32L432KC como única plataforma principal. Valeria realizó una evaluación inicial y considera más apropiado STM32; no se presenta esa evaluación como prueba física ni como medición de tasas.
+STM32L432KC ofrece ADC de 12 bits, temporizadores, DMA y SPI que permiten plantear adquisición secuencial de dos canales disparada por hardware y ventanas estables. La combinación simplifica el control temporal y la integración con Raspberry Pi. Capacidad nominal no equivale a desempeño demostrado: medir cadencia, desfase CH1/CH2 e integridad sigue siendo obligatorio.
+ESP32-S3 fue comparado por su capacidad de procesamiento, adquisición multicanal y SPI periférico. Sus funciones de conectividad no son necesarias porque HTTP reside en Raspberry Pi; su ruta de adquisición y preparación de transferencias exigiría validación propia. Se conserva este contexto histórico sin declarar inferioridad experimental. ESP32-S3 sale del desarrollo, asignaciones y ensayos obligatorios; no se mantendrá una segunda plataforma.
 
-STM32L432KC. Cortex-M4 a 80 MHz, 64 KB SRAM, 256 KB Flash, un ADC de 12 bits con conversión máxima nominal del orden de 5 Msps, temporizadores, DMA y dos SPI. Se propone disparar con TIM el escaneo secuencial de CH1/CH2 y guardar en DMA. Ventaja: temporización directamente controlada por periféricos y amplio margen nominal a 40 kSa/s POR CANAL (80 kconv/s para dos canales). Límite: muestras CH1/CH2 no simultáneas; medición del desfase y del tiempo real de adquisición obligatoria.
+2. ENTORNO Y FRAMEWORK
+Entorno: Visual Studio Code + PlatformIO. MCU: STM32L432KC. Framework inicial: STM32Cube HAL; CMSIS como soporte de bajo nivel; STM32 LL cuando convenga para periféricos críticos, documentando motivo e interacción con HAL. Sin RTOS en la implementación inicial.
+Arquitectura propuesta: temporizador de hardware dispara secuencia ADC de dos canales; DMA guarda muestras; una máquina de estados bare-metal gestiona ventanas, comandos SPI y errores. Estas responsabilidades no requieren inicialmente un scheduler de RTOS. Interrupciones y DMA deberán coordinar propiedad de buffers y preparación TX; captura terminada no equivale a transferencia preparada.
+Zephyr aporta servicios de kernel, sincronización, drivers y portabilidad valiosos para sistemas de mayor complejidad. Se pospone porque el alcance inicial no necesita múltiples tareas planificadas y añadiría configuración y capas que el equipo tendría que validar. No es una limitación de capacidad de Zephyr ni una comparación de rendimiento medida.
+Esta tarea no crea platformio.ini, código HAL/CMSIS/LL ni firmware. Antes de la futura configuración, Andrew y Valeria confirman placa física, pines, reloj y método de programación; Andrew registra versiones de plataforma/framework y procedimiento reproducible. No se presupone una placa Nucleo solo por el nombre del MCU.
 
-ESP32-S3. Dos núcleos hasta 240 MHz, memoria considerablemente mayor, ADC de 12 bits y SPI como periférico con DMA. Tiene adquisición ADC continua multicanal. Sin embargo, Espressif documenta que ADC2 DMA no es estable/soportado: se recomienda usar dos canales de ADC1 secuencialmente. El HAL oficial define para el controlador continuo un límite superior de 83.333 conversiones/s y mínimo de 611 conversiones/s (pueden depender de versión/implementación); 40 kSa/s por canal equivalen a 80.000 conversiones/s, cerca del máximo. Para el preset de 100 Sa/s por canal, habría que estudiar decimación o modo alternativo. ESP32-S3 soporta SPI slave, aunque la preparación de transacciones puede introducir latencia. No asumir sin ensayos una precisión analógica o jitter determinados.
+3. ENSAYOS PREVISTOS SOLO SOBRE STM32L432KC
+Todos pendientes; responsables Andrew (firmware), Valeria (hardware/caracterización), Checho (metodología/evidencias), Pipe y Ferxxo (SPI/SBC). Contrato único: docs/03_contratos_interfaces_v0_2.txt; trazabilidad: docs/05_matriz_verificacion_inicial.txt.
+E1: ventanas mínimas a cada preset obligatorio; registrar N, frecuencia medida por canal, método y señales (V01–V05).
+E2: objetivo adicional de 40.000 Sa/s por canal; medir continuidad, pérdidas y desfase; si falla registrar límite alcanzado (V13).
+E3: DC y senoide conocida en ambos canales; promedio, ruido, amplitud y repetibilidad con límites eléctricos documentados por Valeria. Sin patrón no afirmar calibración (V01).
+E4: medir cadencia y jitter con instrumento y, cuando exista firmware, GPIO marcador; distinguir marcador de instante interno de conversión (V03–V05/V13).
+E5: partir de SCLK candidato y aumentar solo dentro de límites de ambos extremos; medir tiempo completo, CRC, errores y preparación de TX, CS, READY y ACK (V06–V09/V16).
+E6: 100 ventanas por preset y 5 cambios de frecuencia como plan inicial; comprobar secuencia, ausencia de mezcla y datos obsoletos (V06/V08/V09). Fijar tolerancias antes de emitir PASS/FAIL.
+Valeria caracterizará físicamente placa, alimentación, niveles, entradas ADC y montaje, y participará en la justificación experimental junto con Checho. No debe desarrollar firmware alternativo.
 
-CONCLUSIÓN. Se recomienda STM32L432KC como MCU principal para el primer prototipo, pues permite una adquisición temporizada de dos canales con margen teórico y sin depender de Wi-Fi/BLE. ESP32-S3 sigue siendo alternativa legítima, no descartada experimentalmente. Esta es una preferencia de ingeniería, NO una prueba de rendimiento absoluto ni garantía de bonificación. La elección física se confirma tras los ensayos de abajo y la disponibilidad real de tarjetas/pines.
+4. ESTIMACIONES, NO RESULTADOS
+Ventana mínima: 64 pares x 2 canales x 16 bits = 256 B. A 1 MHz el payload ideal requiere 2,048 ms sin overhead. Un flujo continuo de 40.000 Sa/s/canal requiere 1,28 Mbit/s de payload, superior a ese SCLK inicial; captura por ventanas no obliga a streaming continuo.
+64/fs es el presupuesto temporal de 64 periodos (0,640 / 0,064 / 0,0064 / 0,0016 s para los cuatro presets); la separación entre la primera y última muestra de un canal es 63/fs, y el tiempo completo depende del disparo y conversiones. Medir y declarar el criterio usado.
 
-ENSAYOS MÍNIMOS COMPARABLES EN AMBOS MCU (Checho + firmware + hardware):
-E1: 64 pares por ventana a 100, 1.000, 10.000 Sa/s; registrar N, frecuencia medida, método y señales utilizadas.
-E2: repetir a 40.000 Sa/s por canal si configuración lo permite; medir continuidad, pérdidas y desfase CH1/CH2; si falla documentar límite alcanzado.
-E3: introducir señal DC y senoide conocida en ambos canales: medir promedio, ruido, amplitud y repetibilidad sin afirmar calibración sin patrón.
-E4: medir con osciloscopio o analizador lógico el intervalo entre eventos de muestreo usando un GPIO marcador; el marcador mide la temporización del firmware, no necesariamente el instante interno exacto de conversión ADC.
-E5: transmitir 256 bytes de muestras + cabecera/CRC por SPI en 1,2,4,8 MHz escalonadamente; medir tiempo completo, integridad, errores y velocidad real; comparar con el máximo nominal de las hojas de datos del MCU y de la Raspberry Pi concreta.
-E6: 100 ventanas consecutivas por preset y 5 cambios de frecuencia; verificar que no haya mezclas ni resultados obsoletos.
+5. FUENTES PRIMARIAS CONSULTADAS PARA LA DECISIÓN
+- ST, STM32L432KC: https://www.st.com/en/microcontrollers-microprocessors/stm32l432kc.html
+- ST, hoja de datos: https://www.st.com/resource/en/datasheet/stm32l432kc.pdf
+- PlatformIO, STM32Cube HAL/LL: https://docs.platformio.org/en/latest/frameworks/stm32cube.html
+- Zephyr, servicios y alcance: https://docs.zephyrproject.org/latest/introduction/index.html
+- Comparación histórica ESP32-S3 ADC: https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/adc/adc_continuous.html
 
-FÓRMULAS. Ventana mínima: 64 pares × 2 canales × 16 bits = 2048 bits = 256 B; a 1 MHz, transmisión ideal payload = 2,048 ms (sin overhead). Para flujo continuo 40.000 Sa/s/canal, caudal solo de payload = 40.000×2×16 = 1,28 Mbit/s. La duración de ventana de 64 muestras es 64/fs (0,640 s a 100 Sa/s; 0,064 s a 1.000; 0,0064 s a 10.000; 0,0016 s a 40.000). Distinguir captura por ventanas de streaming continuo.
-
-FUENTES PRIMARIAS:
-- ST, STM32L432KC datasheet: https://www.st.com/resource/en/datasheet/stm32l432kc.pdf
-- ST, NUCLEO-L432KC: https://www.st.com/en/evaluation-tools/nucleo-l432kc.html
-- Espressif, ESP32-S3 ADC continuous: https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/adc/adc_continuous.html
-- Espressif, limitaciones del controlador ADC (HAL): https://github.com/espressif/esp-idf/blob/master/components/esp_hal_ana_conv/esp32s3/include/hal/adc_ll.h
-- Espressif, SPI slave: https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/spi_slave.html
-
-ABIERTO. Modelo exacto Raspberry Pi y placa ESP32-S3; hoja de datos de placa, pinout efectivo, alimentación, máximos SPI conjuntos y versión de ESP-IDF.
+PENDIENTES: placa STM32 concreta, modelo Raspberry Pi, pinout efectivo, límites eléctricos, configuración reproducible de herramientas, máximos SPI conjuntos y aprobación del contrato. No existen evidencias experimentales de tasas ni integración.

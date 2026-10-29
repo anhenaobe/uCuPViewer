@@ -1,39 +1,42 @@
 # Linux 2 · uCuPViewer
 
-Proyecto universitario: sistema híbrido de adquisición de dos señales analógicas por microcontrolador y visualización HTTP desde Raspberry Pi con comunicación SPI.
+Proyecto universitario de adquisición de dos señales analógicas con STM32L432KC y visualización HTTP desde Raspberry Pi mediante SPI.
 
-**ESTADO: planificación técnica / interfaz v0.1 propuesta / hardware y software NO integrados.** No hay resultados experimentales todavía.
+**Estado: planificación técnica; contrato v0.2 propuesto, pendiente de aprobación. Firmware, SPI, backend y dashboard todavía no están integrados ni validados. No hay resultados experimentales registrados.**
 
-## Requisitos del profesor
-- Dos canales analógicos; ventanas con **al menos 64 muestras** por canal (interpretación de diseño, pendiente de confirmar).
-- Frecuencias intercambiables por SPI: **100, 1.000 y 10.000 Sa/s**. Bonificación experimental para **≥40.000 Sa/s**.
-- Raspberry Pi: comunicación SPI con MCU; gráficas servidas en red por **Apache o Nginx**.
-- Refresco del dashboard entre **0,25 y 1 Hz** (una actualización cada 1–4 segundos).
-- Estimación teórica de máximos SPI desde hojas de datos y contraste experimental.
-- Repositorio, documentación, matriz de verificación y resultados, video, declaración de aportes y declaración de IA con registro de interacciones.
+Repositorio existente: [anhenaobe/uCuPViewer](https://github.com/anhenaobe/uCuPViewer). `main` contiene la versión integrada; el desarrollo se presenta mediante ramas por tarea y Pull Requests.
 
-## Plataforma y decisión preliminar
-MCU principal recomendado: **STM32L432KC**; ESP32-S3 como alternativa bajo prueba. SBC: **Raspberry Pi, modelo exacto por confirmar**. El microcontrolador debe capturar mediante reloj/periférico de hardware y almacenar una ventana; el SBC gobierna SPI y atiende la web. Las dos entradas ADC no necesariamente se adquieren simultáneamente.
+## Plataforma seleccionada
 
-## Documentos de arranque
-- `docs/01_revision_esqueleto_profesor.txt`: qué existe y qué falta del ZIP.
-- `docs/02_roles_responsabilidades.txt`: asignación de seis miembros y criterios de aceptación.
-- `docs/03_contratos_interfaces_v0_1.txt`: acuerdos técnicos iniciales SPI, ventana, backend y frontend. **Propuesta, NO congelada**.
-- `docs/04_eleccion_mcu_y_pruebas.txt`: breve documento técnico para el grupo, con fuentes.
-- `docs/05_matriz_verificacion_inicial.txt`: pruebas y evidencias a recoger (todos pendientes).
-- `docs/06_flujo_git.txt`: ramas, PR, revisiones y límites de autoría.
-- `docs/07_aportes_ia.txt`: formatos de registro exigidos por el profesor.
-- `reference/profesor/`: códigos y diagrama originales extraídos del ZIP, sin ejecutables compilados ni carpetas `.git` anidadas.
+STM32L432KC es la única plataforma de desarrollo. La evaluación inicial de Valeria favorece STM32 por ADC, temporización, DMA, SPI y simplicidad de integración. ESP32-S3 queda como comparación histórica, sin desarrollo ni pruebas obligatorias.
 
-## Árbol de trabajo
-- `firmware/stm32/` y `firmware/esp32s3/`: implementaciones que aún no existen.
-- `hardware/`: cableado, niveles, pinout y mediciones.
-- `backend/`: adquisición desde Linux por SPI, gestión de ventanas, API.
-- `frontend/`: dashboard y sus pruebas.
-- `infrastructure/`: configuración HTTP, despliegue y arranque del servicio.
-- `tests/`: pruebas automatizadas y evidencias de laboratorio.
+Decisión técnica inicial: Visual Studio Code + PlatformIO, STM32Cube HAL, CMSIS como soporte de bajo nivel y STM32 LL cuando convenga para periféricos críticos. Arquitectura bare-metal con máquina de estados, sin RTOS inicial. La justificación y fuentes están en [la nota técnica](docs/04_eleccion_mcu_y_pruebas.txt). No se ha creado `platformio.ini` ni firmware; la placa física, pinout, herramientas y versiones se confirmarán antes de configurarlos.
 
-## Primer hito
-Revisar y aprobar interfaces; pruebas de humo de ambas placas; mock de SPI y API con datos simulados; después integrar hardware. **No subir binaries, `.o`, `.d`, `target/`, secretos ni configuraciones locales de red.**
+## Requisitos y acuerdos propuestos
 
-Este paquete fue generado como propuesta de organización. El código fuente en `reference/profesor/` pertenece al esqueleto suministrado por el docente; no se atribuye a los estudiantes. Ver `docs/07_aportes_ia.txt`.
+- Dos canales ADC de 12 bits; ventana mínima de 64 muestras por canal, RAW en `uint16_t`, intercaladas CH1/CH2 y little-endian. La adquisición secuencial no implica simultaneidad.
+- Presets de 100, 1.000 y 10.000 Sa/s por canal; 40.000 Sa/s por canal es un objetivo adicional sujeto a medición.
+- Raspberry Pi controla SPI; STM32L432KC es periférico. Modo 0, 8 bits, MSB-first, CS bajo y SCLK inicial de 1 MHz son candidatos sin validación física.
+- Dashboard servido por Apache o Nginx, con refresco entre 1 y 4 segundos, inicialmente 2 segundos. Esa cadencia es independiente de la adquisición ADC.
+- Estimación teórica y contraste experimental de SPI; documentación, matriz de verificación, evidencias, video, aportes e interacciones con IA.
+
+El [contrato activo v0.2](docs/03_contratos_interfaces_v0_2.txt) es la única fuente de detalles de trama y API. Captura terminada y transferencia SPI preparada son condiciones distintas. READY, tiempos y secuencia ACK siguen provisionales.
+
+## Documentación
+
+- [Revisión del esqueleto del profesor](docs/01_revision_esqueleto_profesor.txt).
+- [Roles compartidos](docs/02_roles_responsabilidades.txt) y guías por integrante: [Andrew](docs/por_integrante/andrew.txt), [Valeria](docs/por_integrante/valeria.txt), [Checho](docs/por_integrante/checho.txt), [Mateo](docs/por_integrante/mateo.txt), [Pipe](docs/por_integrante/pipe.txt) y [Ferxxo](docs/por_integrante/ferxxo.txt).
+- [Contrato v0.2](docs/03_contratos_interfaces_v0_2.txt), [elección técnica y ensayos previstos](docs/04_eleccion_mcu_y_pruebas.txt), [matriz de verificación](docs/05_matriz_verificacion_inicial.txt).
+- [Flujo Git](docs/06_flujo_git.txt) y [registro de aportes e IA](docs/07_aportes_ia.txt).
+
+## Estructura y próximo hito
+
+- `firmware/stm32/`: espacio reservado para firmware futuro.
+- `hardware/`: pinout, montaje y caracterización eléctrica futura.
+- `backend/`, `frontend/`, `infrastructure/`: espacios de trabajo de Linux/SPI, dashboard y servicios HTTP; su existencia no demuestra funcionamiento.
+- `tests/`: espacio para pruebas y evidencias futuras.
+- `reference/profesor/`: fuentes C/C++/Rust y diagrama originales atribuidos al docente. No modificarlos ni atribuirlos al equipo.
+
+Primero revisar contratos y placa/pines; después preparar configuración y pruebas con mocks mediante tareas separadas. Esta actualización solo documenta decisiones y prepara `.gitignore`; la implementación debe esperar revisión.
+
+No sobrescribir trabajo de compañeros ni cambiar PASS/FAIL sin evidencia original. Los cambios de contratos requieren revisión de responsables afectados. Conservar fuentes, scripts, linker scripts y configuración propia; excluir compilaciones, cachés y secretos. Confirmar permiso del docente antes de redistribuir públicamente su referencia. Ver [atribución original](reference/profesor/ORIGEN.txt).

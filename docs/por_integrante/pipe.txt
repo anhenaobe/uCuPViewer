@@ -1,0 +1,21 @@
+PIPE - BACKEND LINUX E INTERFAZ SPI
+Estado: plan futuro; SPI/API no están validados.
+
+1. OBJETIVO
+Conectar adquisición y dashboard mediante transacciones y ventanas coherentes con errores explícitos.
+2. RESPONSABILIDADES PROPIAS
+Planificar proceso Linux, SPI como controlador, parser/CRC, secuencias, latest-window, API y mocks. Evaluar adaptación atribuida del DAQ del profesor fuera de reference/profesor/. Separar captura completa de preparación TX.
+3. ENTRADAS NECESARIAS
+Andrew: estados y preparación de respuesta STM32. Ferxxo: dispositivo/permisos/configuración SPI. Valeria: cableado/pines. Mateo: necesidades HTTP. Checho: casos y criterios de integridad.
+4. SALIDAS
+Plan de backend y, después de aprobación, servicio y guía reproducibles, mocks identificados, resultados de parser/transacciones y API conforme al contrato; errores y límites registrados.
+5. CONTRATOS A RESPETAR
+docs/03_contratos_interfaces_v0_2.txt es la única definición SPI/HTTP. Mantener bytes, endian, CRC y semántica candidata hasta revisión; ACK, READY y tiempos aún provisionales. No informar preset aplicado sin confirmación real. Seguir docs/06_flujo_git.txt.
+6. ACTIVIDADES SIN ESPERAR
+Revisar patrón DAQ, listar casos de parser/errores y preguntas de handshake, acordar ejemplos API con Mateo. Esta tarea no implementa backend ni mocks ejecutables.
+7. ENTREGABLES Y ACEPTACIÓN
+Futuros PR con procedimiento de ejecución, parser probado ante entradas inválidas, ventanas sin mezcla de generaciones, errores claros y funcionamiento con fake SPI etiquetado; hardware requiere ensayo aparte.
+8. PRUEBAS A EJECUTAR O APOYAR
+V06/V09/V10/V16; apoyar V08/V15 con Andrew, Ferxxo y Checho. Medir timeout/retry solo tras acordar límites; conservar evidencia negativa.
+9. DEPENDENCIAS
+Andrew para periférico y máquina de estados, Ferxxo para acceso/despliegue, Valeria para conexión, Mateo para API y Checho para resultados verificables. Aprobación conjunta antes de congelar SPI.

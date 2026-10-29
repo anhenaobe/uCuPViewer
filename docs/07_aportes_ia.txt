@@ -23,3 +23,5 @@ INICIO DE REGISTRO:
 - 2026-10-23: ChatGPT (GPT-6), asistencia en revisión del ZIP del profesor, comparación STM32L432KC vs ESP32-S3, propuesta de contratos/roles/matriz, preparación de estructura. Verificación: cotejo de especificaciones con documentación oficial; revisión de fuentes del ZIP; NO se han ejecutado mediciones sobre tarjetas físicas y no se ha probado implementación integrada. Guardar exportación/contenido de esta conversación según exigencia del docente.
 
 ADVERTENCIA: el contenido del ZIP del profesor es referencia ajena. No atribuirlo como implementación original de integrantes. El informe final debe distinguir sugerencias de IA, código propio, código del profesor y verificaciones reales.
+
+- 2026-10-29: asistencia de Codex para actualización documental a STM32L432KC/PlatformIO, roles, contrato v0.2 y reglas Git. Alcance: documentación y .gitignore; sin firmware ni platformio.ini ni ensayos físicos. Verificaciones y PR asociados: consultar el PR de docs/stm32-platformio-setup. Revisión humana pendiente; conservar esta conversación como registro de la interacción.

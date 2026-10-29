@@ -1,0 +1,21 @@
+CHECHO - VERIFICACIÓN, PRUEBAS Y EVIDENCIAS
+Estado: plan; todos los ensayos físicos siguen pendientes.
+
+1. OBJETIVO
+Convertir requisitos en verificaciones trazables y conclusiones sustentadas por evidencia.
+2. RESPONSABILIDADES PROPIAS
+Definir procedimientos, tolerancias, instrumentos y repeticiones antes de PASS/FAIL. Ejecutar y coordinar ensayos, guardar evidencia original y registrar fallos/bloqueos sin reinterpretar aportes ajenos. No exigir ensayos de plataforma alternativa.
+3. ENTRADAS NECESARIAS
+Andrew: versiones y comportamiento de firmware. Valeria: montaje/límites/instrumentos. Pipe: backend/mocks. Mateo: interfaz. Ferxxo: despliegue/modelo/configuración SBC.
+4. SALIDAS
+Matriz trazable, procedimientos reproducibles y resultados con fecha, commit, placa, versión, método, instrumentos y enlace de evidencia; lista de límites pendientes.
+5. CONTRATOS A RESPETAR
+docs/03_contratos_interfaces_v0_2.txt y docs/05_matriz_verificacion_inicial.txt son referencias canónicas. Seguir docs/06_flujo_git.txt; ninguna simulación demuestra adquisición real. No cambiar PASS/FAIL sin evidencia original.
+6. ACTIVIDADES SIN ESPERAR
+Completar criterios de aceptación propuestos, inventariar instrumentos, preparar fichas y casos normales/borde/fallo. Marcar NOT_RUN o BLOCKED cuando corresponda, sin inventar resultados.
+7. ENTREGABLES Y ACEPTACIÓN
+Cada requisito con prueba y evidencia o estado pendiente explícito. Separar cálculos teóricos, simulaciones y medidas. Conservar V14 retirado para trazabilidad, sin ensayo obligatorio de segunda plataforma.
+8. PRUEBAS A EJECUTAR O APOYAR
+Coordinar V01–V13 y V15–V17 con sus responsables. V13 es objetivo adicional. Verificar captura terminada/TX preparada, integridad y errores; no fijar PASS/FAIL físico antes de acordar tolerancias.
+9. DEPENDENCIAS
+Todos entregan versiones y condiciones reproducibles; Valeria apoya instrumentación, Andrew adquisición, Pipe/Ferxxo SPI y Mateo/Ferxxo HTTP. Checho participa en revisión de cambios que afecten criterios o evidencias.

@@ -1,0 +1,21 @@
+FERXXO - RASPBERRY PI, HTTP, DESPLIEGUE Y APOYO SPI
+Estado: plan futuro; no hay servicios integrados ni tasas SPI demostradas.
+
+1. OBJETIVO
+Preparar un entorno Raspberry Pi reproducible para SPI y acceso HTTP en red.
+2. RESPONSABILIDADES PROPIAS
+Identificar modelo/OS, documentar habilitación y permisos SPI, proponer Nginx o Apache, proxy y arranque de servicios. Apoyar con Valeria pinout/CS/niveles y con Andrew/Pipe preparación de transacciones y medición de SCLK.
+3. ENTRADAS NECESARIAS
+Valeria: montaje/pinout/límites. Andrew/Pipe: protocolo y necesidades de acceso. Mateo: recursos web. Checho: metodología e instrumentos.
+4. SALIDAS
+Inventario y plan de despliegue; en futuras tareas, instrucciones/scripts reproducibles, configuración HTTP y arranque, diagnóstico y evidencias de red/SPI con versiones.
+5. CONTRATOS A RESPETAR
+docs/03_contratos_interfaces_v0_2.txt para SPI/HTTP y docs/06_flujo_git.txt para aportes. No sustituir servidor HTTP requerido por servidor de desarrollo. READY, espaciado y ACK deben acordarse, no asumirse operativos.
+6. ACTIVIDADES SIN ESPERAR
+Inventariar Pi/OS, revisar documentación oficial, proponer diagrama de despliegue y checklist de red/permisos. Esta tarea no instala ni configura servicios ni implementa scripts.
+7. ENTREGABLES Y ACEPTACIÓN
+Futuros PR con puesta en marcha reproducible en Pi documentada, dashboard accesible desde otra máquina, servicios que arrancan tras reinicio y límites SPI medidos. No afirmar funcionamiento por tener archivos de configuración.
+8. PRUEBAS A EJECUTAR O APOYAR
+V07/V08 con Checho (máximos teóricos de ambos extremos y SCLK real), V11, V15/V16 y repetibilidad de despliegue en V17. Separar teoría, payload ideal y tiempo completo medido.
+9. DEPENDENCIAS
+Valeria para hardware seguro; Andrew/Pipe para protocolo y servicio; Mateo para frontend; Checho para evidencias. Revisar decisiones SPI con todos los responsables afectados antes de integración.
