@@ -1,0 +1,21 @@
+MATEO - DASHBOARD Y FRONTEND
+Estado: plan de trabajo; una rama de desarrollo no demuestra integración operativa.
+
+1. OBJETIVO
+Presentar dos canales, controles y estados comprensibles mediante la API acordada.
+2. RESPONSABILIDADES PROPIAS
+Planificar dashboard, eje temporal, unidades RAW frente a voltaje calibrado, controles de preset, refresco, desconexión y errores. Identificar simulación y evitar solicitudes solapadas. Conservar trabajo existente en ramas de frontend.
+3. ENTRADAS NECESARIAS
+Pipe: contrato y respuestas API/mocks. Andrew: semántica de adquisición vía Pipe. Checho: criterios de refresco/errores. Ferxxo: ruta HTTP/proxy y despliegue.
+4. SALIDAS
+Diseño de interfaz y, en tareas futuras, frontend con instrucciones, pruebas, capturas y demo simulada claramente etiquetada; reporte de necesidades de estados a Pipe/Andrew.
+5. CONTRATOS A RESPETAR
+API/datos/refresco en docs/03_contratos_interfaces_v0_2.txt; no duplicar endpoints ni tramas aquí. No mostrar éxito de preset sin confirmación del backend. Seguir docs/06_flujo_git.txt.
+6. ACTIVIDADES SIN ESPERAR
+Revisar contrato, preparar casos visuales y de error, acordar ejemplos con Pipe y plan de pruebas. Esta tarea documental no modifica frontend ni inicia su implementación.
+7. ENTREGABLES Y ACEPTACIÓN
+Futuro PR con dos curvas, unidades/tiempo correctos, controles acordes al contrato, origen de datos visible, errores claros y refresco medido dentro de límites. Demo simulada no cuenta como integración física.
+8. PRUEBAS A EJECUTAR O APOYAR
+V10 con Pipe, V12 con Checho, V11/V15 con Ferxxo y pruebas de V16 para fallos visibles. Registrar versión, método y capturas.
+9. DEPENDENCIAS
+Pipe para API y mocks; Ferxxo para HTTP real; Andrew para estados de hardware; Checho para aceptación. Revisar cambios de API con responsables afectados antes de adaptarlos.

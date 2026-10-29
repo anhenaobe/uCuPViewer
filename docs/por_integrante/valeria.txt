@@ -1,0 +1,21 @@
+VALERIA - HARDWARE Y CARACTERIZACIÓN FÍSICA
+Estado: plan de trabajo futuro; evaluación inicial favorable a STM32, sin evidencia física registrada.
+
+1. OBJETIVO
+Asegurar montaje y señales adecuados para la placa STM32L432KC seleccionada y contribuir a su justificación experimental.
+2. RESPONSABILIDADES PROPIAS
+Identificar placa y revisión exactas, documentar pinout, alimentación, tierra, niveles SPI y límites ADC. Preparar montaje, puntos de medida, fotos y diagrama. Caracterizar físicamente alimentación y entradas, ruido, amplitud y desfase con metodología acordada; participar en interpretación experimental junto con Checho y Andrew. No desarrollar firmware alternativo ni mantener una segunda plataforma.
+3. ENTRADAS NECESARIAS
+Andrew: restricciones ADC/TIM/DMA/SPI y pines candidatos. Ferxxo: pinout y configuración de Raspberry Pi 4 Model B (modelo confirmado). Checho: instrumentos y criterios previos al ensayo. Pipe: necesidades de conexión y diagnóstico.
+4. SALIDAS
+Identificación física, pinout sin conflictos, esquema de conexión, checklist eléctrico, condiciones de señales, fotos y mediciones originales con instrumentos/fecha/versiones.
+5. CONTRATOS A RESPETAR
+Consultar docs/03_contratos_interfaces_v0_2.txt, sin redefinir señales o READY unilateralmente; límites reales de la placa y hojas de datos. Aplicar docs/06_flujo_git.txt y trazabilidad de docs/05_matriz_verificacion_inicial.txt.
+6. ACTIVIDADES SIN ESPERAR
+Inventariar placa e instrumentos, leer manual/esquema, proponer pinout y checklist, preparar documentación física y plan de mediciones. No declarar características medidas a partir de especificaciones.
+7. ENTREGABLES Y ACEPTACIÓN
+Pinout revisado con Andrew/Ferxxo, montaje documentado sin conflictos, entradas seguras y repetibles y evidencia de amplitud en terminales ADC. Justificación experimental debe separar valores nominales y medidas; pendientes explícitos si falta equipo.
+8. PRUEBAS A EJECUTAR O APOYAR
+V01; apoyar V03–V08, V13 adicional y V15 con Andrew/Checho/Ferxxo. Registrar rango, frecuencia y fuente de señal, tierra, instrumento y método; no afirmar calibración sin patrón.
+9. DEPENDENCIAS
+Andrew para firmware y selección de pines; Ferxxo para conexiones SBC; Checho para metodología y evidencia; Pipe para diagnóstico de integración. La evaluación inicial no sustituye la verificación física pendiente.

@@ -9,15 +9,33 @@ build/
 *.hex
 *.map
 *.exe
+# PlatformIO (también en proyectos anidados bajo firmware/stm32/)
+.pio/
+.pioenvs/
+.piolibdeps/
+# Artefactos generados y depuración local
+*.a
+*.su
+*.gcda
+*.gcno
+*.gcov
+/firmware/stm32/**/.gdb_history
+/firmware/stm32/**/openocd.log
 # IDE/editor
 .vscode/
 .idea/
 .DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
 # Datos/secretos
 .env
 .env.*
 *.key
 *.pem
+credentials.local.*
+secrets.local.*
 __pycache__/
 .pytest_cache/
 # logs/artifacts volátiles

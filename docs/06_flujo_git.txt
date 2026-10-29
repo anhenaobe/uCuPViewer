@@ -1,20 +1,18 @@
-POLÍTICA GIT PARA 6 PERSONAS - PROPUESTA
+FLUJO GIT PARA SEIS INTEGRANTES | 2026-10-29
 
-1. Este es un proyecto SEPARADO de Linux-Servers (mensajería TCP) y VibrationDAQ (DAQ de vibraciones). Nombre sugerido para repositorio remoto: uCuPViewer-Linux2 (pendiente de creación en GitHub).
-2. Branch main: estado integrado que pase pruebas mínimas. Nunca subir directamente a main desde desarrollo cotidiano.
-3. Ramas por tarea, no una eterna por persona: firmware/adc-dma, firmware/spi-commands, hardware/pinout, test/verification, frontend/dashboard, backend/spi-reader, infra/nginx. Nombres flexibles y según issue.
-4. Crear Issue con: contexto, responsable, definición de terminado, dependencias, pruebas y rutas previstas.
-5. Git: actualizar main antes de abrir nueva rama; commit pequeño y descriptivo; push de rama; PR hacia main. No mergear PR propio hasta la revisión prevista y las pruebas de integración relevantes.
-6. Toda modificación a docs/03_contratos_interfaces_v0_1.txt requiere revisión conjunta de afectados. Cambiar documentación y tests en el mismo PR.
-7. No modificar los archivos de reference/profesor/ (solo copiar/portar con atribución si se decide reutilizar). No versionar objetos .o, .d, target/, secretos, credenciales, capturas pesadas sin propósito.
-8. Para evidencias, cada prueba queda asociada a commit SHA, placa y versión de firmware; los resultados de Checho no se reinterpretan sin volver a ejecutar el ensayo.
-9. El repositorio podrá ser público o privado según decisión del equipo/docente; si hay material protegido del profesor, consultar permiso antes de publicarlo. Por defecto se recomienda PRIVADO hasta aclararlo.
+1. Repositorio existente: anhenaobe/uCuPViewer, https://github.com/anhenaobe/uCuPViewer.git. Es independiente de Linux-Servers y VibrationDAQ. No crear otro remoto ni reinicializar el proyecto.
+2. main contiene la versión integrada; no implica que el hardware o software ya funcionen. No realizar commits de desarrollo directamente sobre main. Trabajar por tarea y abrir Pull Request hacia main sin fusión automática.
+3. Antes de empezar: git status --short --branch, git fetch origin y revisión de ramas/cambios. Si hay trabajo ajeno, conservarlo; no reset --hard, clean, force-push ni reescritura de ramas compartidas. Acordar solapamientos con el responsable.
+4. Con árbol limpio, crear rama desde origin/main actualizado: git switch -c nombre-de-tarea origin/main. Ejemplos: firmware/adc-dma, hardware/pinout, test/verification, frontend/dashboard, backend/spi-reader e infra/nginx. Esta actualización usa docs/stm32-platformio-setup.
+5. Issue por tarea: contexto, responsable, alcance, dependencias, criterios de terminado, pruebas y rutas. Commit pequeño y descriptivo; revisar git diff y git diff --check; añadir solo archivos previstos y hacer git push -u origin nombre-de-tarea. Abrir PR hacia main con alcance y resultados reales de validación.
+6. Contrato único activo: docs/03_contratos_interfaces_v0_2.txt. Cambios requieren revisión de los responsables afectados: Andrew/Pipe/Ferxxo para SPI, Valeria para señales/pines, Mateo/Pipe para API y Checho para criterios/evidencias. Actualizar referencias y, cuando existan, pruebas afectadas en el mismo PR. No desarrollar versiones incompatibles en paralelo.
+7. No modificar reference/profesor/. Su código y diagrama son referencia atribuida al docente, no implementación original del equipo. Toda adaptación futura se hace fuera de esa carpeta y registra origen. Confirmar permiso del docente antes de redistribución pública.
+8. No cambiar PASS/FAIL sin evidencia original ni reinterpretar ensayos ajenos. Cada resultado identifica commit, placa, firmware/backend, fecha, instrumento, método y evidencia. Conservar fallos y distinguir NOT_RUN, BLOCKED y simulación de ensayos físicos.
+9. Versionar platformio.ini futuro, src/, include/, lib/ propio, test/, linker scripts, configuración necesaria, documentación y scripts de construcción/prueba. Excluir .pio/, .pioenvs/, .piolibdeps/, compilaciones, cachés, secretos y configuración local. Revisar git check-ignore antes de ampliar reglas; no esconder fuentes del docente.
+10. Esta tarea no crea platformio.ini ni implementa firmware/backend/frontend/servicios. El PR documental debe revisarse antes de iniciar firmware. Andrew coordina integración; el PR se fusionará solo tras la revisión prevista y las verificaciones pertinentes.
 
-COMANDOS INICIALES (después de crear repo remoto vacío con URL confirmada):
- git init -b main
- git add .
- git commit -m "docs: base del proyecto y referencias del profesor"
- git remote add origin URL_CONFIRMADA
- git push -u origin main
-
-Si se crea repo remoto con README inicial, clonar primero y copiar la estructura para evitar divergencias de historias.
+COMPROBACIÓN DOCUMENTAL ANTES DEL PR
+- git diff --check
+- git check-ignore -v --no-index sobre rutas de compilación PlatformIO y rutas que deben permanecer versionables.
+- Revisar enlaces locales, referencias al contrato activo, atribución y estado real del proyecto.
+- Confirmar por git diff --name-status que el alcance coincide con la tarea.

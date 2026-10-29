@@ -1,0 +1,21 @@
+ANDREW - COORDINACIÓN TÉCNICA, GITHUB Y FIRMWARE STM32
+Estado: plan de trabajo futuro; esta tarea no implementa firmware.
+
+1. OBJETIVO
+Coordinar integración y preparar una adquisición STM32L432KC reproducible y verificable.
+2. RESPONSABILIDADES PROPIAS
+Organizar issues, ramas, PR y revisiones. Preparar posteriormente VS Code + PlatformIO y STM32Cube HAL con CMSIS, LL si se justifica y sin RTOS inicial. Diseñar ADC disparado por temporizador, DMA, propiedad de buffers, máquina de estados y atención SPI.
+3. ENTRADAS NECESARIAS
+Valeria: placa, pinout, límites y montaje. Pipe/Ferxxo: necesidades y tiempos del controlador SPI. Checho: criterios e instrumentos. Mateo/Pipe: estados necesarios para la interfaz.
+4. SALIDAS
+Plan de firmware y, en tareas posteriores, configuración reproducible, instrucciones de programación, ventanas y estados coherentes, documentación de errores y evidencia asociada a commit.
+5. CONTRATOS A RESPETAR
+Consultar docs/03_contratos_interfaces_v0_2.txt como única definición de SPI/datos/API. Distinguir captura terminada de TX preparada. Respetar docs/06_flujo_git.txt y atribución del profesor; no editar reference/profesor/.
+6. ACTIVIDADES SIN ESPERAR
+Revisar documentación oficial, listar decisiones de reloj/DMA/estados y abrir issues de riesgos y configuración. La implementación y platformio.ini esperan la revisión de esta tarea.
+7. ENTREGABLES Y ACEPTACIÓN
+Ahora: plan técnico y dependencias claras. Después: PR de configuración y firmware con construcción/programación reproducible, ausencia de mezcla de ventanas y cadencia medida; no aceptar por capacidad nominal.
+8. PRUEBAS A EJECUTAR O APOYAR
+Apoyar V02–V06, V08/V09, V13 adicional, V15/V16 con Checho; registrar firmware, instrumentos y método. No atribuirse mediciones ajenas.
+9. DEPENDENCIAS
+Valeria para configuración física; Pipe y Ferxxo para SPI; Checho para validación; Mateo/Pipe para estados visibles. Andrew coordina aprobación de contratos por los responsables afectados.

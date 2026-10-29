@@ -1,21 +1,21 @@
 MATRIZ INICIAL DE VERIFICACIÓN | TODAS LAS PRUEBAS PENDIENTES, SIN RESULTADOS INVENTADOS
-Formato sugerido por registro: ID, requisito, procedimiento, criterio, instrumento, responsable, versión firmware/backend, fecha, resultado (PASS/FAIL/BLOCKED), enlace de evidencia.
+Formato sugerido por registro: ID, requisito, procedimiento, criterio, instrumento, responsable, versión firmware/backend, fecha, resultado (NOT_RUN/PASS/FAIL/BLOCKED), enlace de evidencia.
 
 ID   REQUISITO          PROCEDIMIENTO / CRITERIO DE ACEPTACIÓN                           RESPONSABLE
 V01  Dos canales        DC distintas en CH1 y CH2; arrays diferentes y sin intercambio    Valeria + Checho
-V02  64 muestras        Comprobar exactamente 64 por canal y orden intercalado en buffer    Tú + Checho
-V03  100 Sa/s           Medir paso ~10 ms por canal y 64 muestras completas               Tú + Checho
-V04  1.000 Sa/s         Medir paso ~1 ms y capturas completas                              Tú + Checho
-V05  10.000 Sa/s        Medir paso ~100 us y capturas completas                            Tú + Checho
-V06  Cambio SPI preset  Solicitar 100→1000→10000→100 y verificar ACK y cadencia real       Tú + Pipe + Checho
+V02  64 muestras        Comprobar exactamente 64 por canal y orden intercalado en buffer    Andrew + Checho
+V03  100 Sa/s           Medir paso ~10 ms por canal y 64 muestras completas               Andrew + Checho
+V04  1.000 Sa/s         Medir paso ~1 ms y capturas completas                              Andrew + Checho
+V05  10.000 Sa/s        Medir paso ~100 us y capturas completas                            Andrew + Checho
+V06  Cambio SPI preset  Solicitar 100→1000→10000→100 y verificar ACK y cadencia real       Andrew + Pipe + Checho
 V07  SPI teórico        Calcular máximos para ambos extremos con datasheets; hipótesis    Ferxxo + Checho
 V08  SPI experimental   Repetir 100 ventanas a cada SCLK; cero CRC erróneo requerido     Ferxxo + Checho
 V09  Integridad         Payload patrón conocido, seq/CRC; detectar errores inyectados      Pipe + Checho
 V10  API mock           GET/POST y errores correctos con MCU simulado                     Pipe + Mateo
 V11  HTTP red           Navegador en otra máquina recibe dashboard desde Nginx/Apache      Ferxxo + Checho
 V12  Refresco           Medir intervalos entre actualizaciones visibles de 1–4 s          Mateo + Checho
-V13  40 kSa/s           Repetir V02/V04 con 40k por canal y evidenciar cadencia/errores    Tú + Checho
-V14  MCU alternativo    Repetir V01–V09 en ESP32-S3 o documentar fallos/bloqueos           Tú + Checho
+V13  40 kSa/s adicional Repetir V02 y medir 40k por canal; evidenciar cadencia/errores    Andrew + Checho
+V14  RETIRADO           Comparación de segunda plataforma fuera del alcance; ID reservado sin resultado
 V15  Integración        Dos señales reales → MCU → SPI → backend → HTTP → dos gráficas     Todos + Checho
 V16  Robustez           Cortar conexión, MCU ocupado, CRC corrupto; errores visibles      Pipe + Checho
 V17  Entregables        Revisar repo, documentos, aportes, IA, video y setup repetible     Coordinación + QA
@@ -25,9 +25,13 @@ CRITERIOS DE MEDICIÓN A DEFINIR ANTES DE EVALUAR PASS/FAIL:
 - Número de repeticiones, instrumento y resolución temporal.
 - Límite de errores SPI a cada SCLK: sugerido 0 CRC inválidos /100 ventanas como prueba inicial, no especificación física universal.
 - Porcentaje de pérdida de ventanas aceptable y semántica de streaming frente a snapshots.
-- Modelo exacto del SBC, pines e interfaz de medición SPI.
+- SBC confirmado: Raspberry Pi 4 Model B. Pendientes: sistema operativo/configuración, pines e interfaz de medición SPI.
 
 REGISTRO DE EJEMPLO (SIN RESULTADO):
 ID=V05 | fecha=PENDIENTE | firmware_sha=PENDIENTE | placa=STM32L432KC | entrada=señal generada | fs_objetivo=10000 Sa/s/canal | fs_medido=PENDIENTE | instrumentos=PENDIENTE | resultado=NOT_RUN | evidencia=PENDIENTE
 
 Nunca cambiar PASS/FAIL de otro responsable sin su evidencia original; las pruebas negativas se conservan y documentan.
+
+Plataforma única: STM32L432KC. Contrato activo: docs/03_contratos_interfaces_v0_2.txt.
+V14 se retira sin renumerar pruebas ni emitir PASS/FAIL. Refresco inicial previsto: 2 s.
+Para V06/V08/V16 comprobar por separado captura terminada y TX preparada; READY, espaciado y ACK pendientes de aprobación y ensayo.
