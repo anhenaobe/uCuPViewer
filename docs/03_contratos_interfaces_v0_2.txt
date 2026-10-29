@@ -12,7 +12,7 @@ A. CONDICIONES DEL SISTEMA
 - Transferir una ventana completa sin que DMA sobrescriba lo leído; usar dos buffers/snapshot o pausar escritura mientras se copia al buffer TX. Definir política de nuevas capturas: preferencia reemplazar última ventana con secuencia y contador de pérdidas; NO mezclar bytes de ventanas distintas.
 
 B. SPI ENTRE SBC Y MCU (PROPUESTA TÉCNICA)
-- Raspberry Pi: controlador/master SPI. STM32L432KC: periférico/slave.
+- Raspberry Pi 4 Model B: controlador/master SPI (modelo confirmado por Andrew; configuración física y rendimiento pendientes). STM32L432KC: periférico/slave.
 - Modo 0 (CPOL=0, CPHA=0), MSB-first, 8 bits, CS activo en bajo; SCLK inicial 1 MHz (NO valor máximo demostrado). Todos los GPIO 3,3 V; tierra compartida.
 - Operación por solicitud del SBC (no streaming continuo obligatorio). Transacciones separadas para enviar comando, recibir estado y recibir ventana; el MCU debe preparar TX antes de que el SBC genere clocks.
 - Captura terminada significa que la ventana ADC está completa y estable; transferencia SPI preparada significa que TX ya tiene la respuesta y puede atender clocks. Son condiciones distintas: la primera no garantiza la segunda. La señal READY y su relación con cada fase aún deben acordarse; no asignar nuevos bits ni respuestas sin revisión.
@@ -49,5 +49,5 @@ Nota: los arrays del ejemplo ilustran estructura solamente; una respuesta real D
 D. VERSIONADO / CONVERGENCIA
 - Contrato editable solo por PR con visto bueno de firmware, backend, frontend y QA; doc actualizado en el mismo PR.
 - Primero usar simuladores y pruebas de contrato, después activar hardware; un mock no cuenta como evidencia de medición real.
-- Pendientes obligatorios antes de congelar v1: modelo concreto de Raspberry Pi, placa física STM32L432KC y pines, obligación o no de copiar la lógica de frame del profesor, topología del backend, temporización de captura y espaciado SPI, decisión READY, secuencia comando/ACK/lectura, política timeout/retry, valor de N final, estrategia de parada ordenada y codificación de estados distinta del status=0 ya candidato.
+- Pendientes obligatorios antes de congelar v1: configuración del sistema operativo y pinout de Raspberry Pi 4 Model B, placa física STM32L432KC y pines, obligación o no de copiar la lógica de frame del profesor, topología del backend, temporización de captura y espaciado SPI, decisión READY, secuencia comando/ACK/lectura, política timeout/retry, valor de N final, estrategia de parada ordenada y codificación de estados distinta del status=0 ya candidato.
 - Validar máquina de estados y preparación TX con Andrew, Pipe, Ferxxo y Checho; Valeria revisa señales/pines y Mateo los estados expuestos por HTTP. Los ejemplos JSON son propuestas, no servicios operativos.

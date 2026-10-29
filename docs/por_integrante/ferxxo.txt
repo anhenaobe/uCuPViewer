@@ -2,9 +2,9 @@ FERXXO - RASPBERRY PI, HTTP, DESPLIEGUE Y APOYO SPI
 Estado: plan futuro; no hay servicios integrados ni tasas SPI demostradas.
 
 1. OBJETIVO
-Preparar un entorno Raspberry Pi reproducible para SPI y acceso HTTP en red.
+Preparar un entorno Raspberry Pi 4 Model B reproducible para SPI y acceso HTTP en red.
 2. RESPONSABILIDADES PROPIAS
-Identificar modelo/OS, documentar habilitación y permisos SPI, proponer Nginx o Apache, proxy y arranque de servicios. Apoyar con Valeria pinout/CS/niveles y con Andrew/Pipe preparación de transacciones y medición de SCLK.
+Modelo confirmado: Raspberry Pi 4 Model B. Identificar sistema operativo y configuración, documentar habilitación y permisos SPI, proponer Nginx o Apache, proxy y arranque de servicios. Apoyar con Valeria pinout/CS/niveles y con Andrew/Pipe preparación de transacciones y medición de SCLK.
 3. ENTRADAS NECESARIAS
 Valeria: montaje/pinout/límites. Andrew/Pipe: protocolo y necesidades de acceso. Mateo: recursos web. Checho: metodología e instrumentos.
 4. SALIDAS

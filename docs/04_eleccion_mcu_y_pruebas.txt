@@ -33,4 +33,6 @@ Ventana mínima: 64 pares x 2 canales x 16 bits = 256 B. A 1 MHz el payload idea
 - Zephyr, servicios y alcance: https://docs.zephyrproject.org/latest/introduction/index.html
 - Comparación histórica ESP32-S3 ADC: https://docs.espressif.com/projects/esp-idf/en/stable/esp32s3/api-reference/peripherals/adc/adc_continuous.html
 
-PENDIENTES: placa STM32 concreta, modelo Raspberry Pi, pinout efectivo, límites eléctricos, configuración reproducible de herramientas, máximos SPI conjuntos y aprobación del contrato. No existen evidencias experimentales de tasas ni integración.
+SBC CONFIRMADO: Raspberry Pi 4 Model B, según información de Andrew. No se infieren RAM, revisión de placa, sistema operativo ni tasas SPI medidas.
+
+PENDIENTES: placa STM32 concreta, sistema operativo y configuración de Raspberry Pi 4 Model B, pinout efectivo, límites eléctricos, configuración reproducible de herramientas, máximos SPI conjuntos y aprobación del contrato. No existen evidencias experimentales de tasas ni integración.

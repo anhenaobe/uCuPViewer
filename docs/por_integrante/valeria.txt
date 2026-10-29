@@ -6,7 +6,7 @@ Asegurar montaje y señales adecuados para la placa STM32L432KC seleccionada y c
 2. RESPONSABILIDADES PROPIAS
 Identificar placa y revisión exactas, documentar pinout, alimentación, tierra, niveles SPI y límites ADC. Preparar montaje, puntos de medida, fotos y diagrama. Caracterizar físicamente alimentación y entradas, ruido, amplitud y desfase con metodología acordada; participar en interpretación experimental junto con Checho y Andrew. No desarrollar firmware alternativo ni mantener una segunda plataforma.
 3. ENTRADAS NECESARIAS
-Andrew: restricciones ADC/TIM/DMA/SPI y pines candidatos. Ferxxo: modelo/pinout de Raspberry Pi. Checho: instrumentos y criterios previos al ensayo. Pipe: necesidades de conexión y diagnóstico.
+Andrew: restricciones ADC/TIM/DMA/SPI y pines candidatos. Ferxxo: pinout y configuración de Raspberry Pi 4 Model B (modelo confirmado). Checho: instrumentos y criterios previos al ensayo. Pipe: necesidades de conexión y diagnóstico.
 4. SALIDAS
 Identificación física, pinout sin conflictos, esquema de conexión, checklist eléctrico, condiciones de señales, fotos y mediciones originales con instrumentos/fecha/versiones.
 5. CONTRATOS A RESPETAR

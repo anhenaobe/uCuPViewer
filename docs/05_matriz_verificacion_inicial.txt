@@ -25,7 +25,7 @@ CRITERIOS DE MEDICIÓN A DEFINIR ANTES DE EVALUAR PASS/FAIL:
 - Número de repeticiones, instrumento y resolución temporal.
 - Límite de errores SPI a cada SCLK: sugerido 0 CRC inválidos /100 ventanas como prueba inicial, no especificación física universal.
 - Porcentaje de pérdida de ventanas aceptable y semántica de streaming frente a snapshots.
-- Modelo exacto del SBC, pines e interfaz de medición SPI.
+- SBC confirmado: Raspberry Pi 4 Model B. Pendientes: sistema operativo/configuración, pines e interfaz de medición SPI.
 
 REGISTRO DE EJEMPLO (SIN RESULTADO):
 ID=V05 | fecha=PENDIENTE | firmware_sha=PENDIENTE | placa=STM32L432KC | entrada=señal generada | fs_objetivo=10000 Sa/s/canal | fs_medido=PENDIENTE | instrumentos=PENDIENTE | resultado=NOT_RUN | evidencia=PENDIENTE

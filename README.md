@@ -1,6 +1,6 @@
 # Linux 2 · uCuPViewer
 
-Proyecto universitario de adquisición de dos señales analógicas con STM32L432KC y visualización HTTP desde Raspberry Pi mediante SPI.
+Proyecto universitario de adquisición de dos señales analógicas con STM32L432KC y visualización HTTP desde Raspberry Pi 4 Model B mediante SPI.
 
 **Estado: planificación técnica; contrato v0.2 propuesto, pendiente de aprobación. Firmware, SPI, backend y dashboard todavía no están integrados ni validados. No hay resultados experimentales registrados.**
 

@@ -12,7 +12,7 @@ Valeria: hardware, pinout, montaje y documentación física. Caracterizará alim
 Checho: planificación y ejecución de verificación, pruebas y evidencias. Define criterios antes del ensayo, coordina pruebas con cada responsable y conserva resultados originales. Aceptación futura: requisitos trazados a pruebas y evidencia, sin afirmar cumplimiento sin medida. Guía: docs/por_integrante/checho.txt.
 Mateo: dashboard y frontend. Planifica visualización de dos canales, controles, estados y mocks HTTP; diferencia simulación y hardware. Aceptación futura: curvas y controles conforme al contrato, errores visibles y refresco medido. Guía: docs/por_integrante/mateo.txt.
 Pipe: backend Linux e interfaz SPI. Planifica transacciones, parser/CRC, ventanas coherentes, API y mocks; evalúa cómo adaptar el patrón DAQ del docente con atribución. Aceptación futura: respuestas verificadas, errores explícitos y ninguna confirmación de preset sin ACK válido. Guía: docs/por_integrante/pipe.txt.
-Ferxxo: infraestructura Raspberry Pi, servicios HTTP, despliegue y apoyo SPI. Documentará modelo, habilitación SPI, servidor HTTP/proxy y arranque de servicios; colaborará en medición SCLK y temporización. Aceptación futura: instalación reproducible y HTTP/SPI verificados con evidencia. Guía: docs/por_integrante/ferxxo.txt.
+Ferxxo: infraestructura Raspberry Pi, servicios HTTP, despliegue y apoyo SPI. Documentará la configuración de Raspberry Pi 4 Model B, habilitación SPI, servidor HTTP/proxy y arranque de servicios; colaborará en medición SCLK y temporización. Aceptación futura: instalación reproducible y HTTP/SPI verificados con evidencia. Guía: docs/por_integrante/ferxxo.txt.
 
 COLABORACIONES
 - Andrew + Pipe + Ferxxo + Checho: contrato y pruebas SPI; Valeria revisa señales/pines.
