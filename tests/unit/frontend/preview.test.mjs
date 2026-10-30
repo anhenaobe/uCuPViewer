@@ -42,7 +42,7 @@ test("la vista previa usa N real y descarta respuestas y errores de solicitudes 
   const ids = [
     "sample-rate", "window-state", "error-message", "plot-ch1", "plot-ch2",
     "source-badge", "source-label", "source-description", "sample-count",
-    "sample-rate-value", "window-span", "adc-resolution",
+    "sample-rate-value", "window-span", "adc-resolution", "plot-note",
   ];
   const elements = new Map(ids.map((id) => ["#" + id, new FakeElement()]));
   const select = elements.get("#sample-rate");
@@ -87,12 +87,14 @@ test("la vista previa usa N real y descarta respuestas y errores de solicitudes 
 
     assert.equal(elements.get("#sample-count").textContent, 128);
     assert.equal(elements.get("#window-span").textContent, "12,8 ms");
+    assert.match(elements.get("#plot-note").textContent, /0 a 12,7 ms.*12,8 ms \(128 periodos\)/);
     assert.equal(elements.get("#window-state").textContent, "Ventana 33 · 128 muestras");
 
     pending[0].resolve({ ok: true, json: async () => fixture1000 });
     await flushAsync();
     assert.equal(elements.get("#window-state").textContent, "Ventana 33 · 128 muestras");
     assert.equal(elements.get("#window-span").textContent, "12,8 ms");
+    assert.match(elements.get("#plot-note").textContent, /0 a 12,7 ms.*12,8 ms \(128 periodos\)/);
 
     select.value = "100";
     select.listeners.get("change")();
@@ -103,10 +105,12 @@ test("la vista previa usa N real y descarta respuestas y errores de solicitudes 
     pending[3].resolve({ ok: true, json: async () => fixture1000 });
     await flushAsync();
     assert.equal(elements.get("#window-state").textContent, "Ventana " + fixture1000.window_id + " · 64 muestras");
+    assert.match(elements.get("#plot-note").textContent, /0 a 63 ms.*64 ms \(64 periodos\)/);
 
     pending[2].reject(new Error("Fallo tardío de red"));
     await flushAsync();
     assert.equal(elements.get("#window-state").textContent, "Ventana " + fixture1000.window_id + " · 64 muestras");
+    assert.match(elements.get("#plot-note").textContent, /0 a 63 ms.*64 ms \(64 periodos\)/);
     assert.equal(elements.get("#error-message").hidden, true);
     assert.equal(elements.get("#window-state").classList.contains("error-state"), false);
   } finally {

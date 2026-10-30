@@ -9,16 +9,20 @@ const plotCh2 = document.querySelector("#plot-ch2");
 const sourceBadge = document.querySelector("#source-badge");
 const sourceLabel = document.querySelector("#source-label");
 const sourceDescription = document.querySelector("#source-description");
+const plotNote = document.querySelector("#plot-note");
 
 const formatInteger = (value) => value.toLocaleString("es-CO");
 const formatDurationMs = (value) => `${value.toLocaleString("es-CO", { maximumFractionDigits: 3 })} ms`;
 
 function displayWindow(windowData) {
   const rate = windowData.sample_rate_hz;
-  const spanMs = windowData.samples_per_channel / rate * 1000;
+  const count = windowData.samples_per_channel;
+  const spanMs = count / rate * 1000;
+  const lastSampleMs = (count - 1) / rate * 1000;
   document.querySelector("#sample-count").textContent = windowData.samples_per_channel;
   document.querySelector("#sample-rate-value").textContent = `${formatInteger(rate)} Sa/s`;
   document.querySelector("#window-span").textContent = formatDurationMs(spanMs);
+  plotNote.textContent = `Eje X: 0 a ${formatDurationMs(lastSampleMs)} (última muestra). Duración nominal: ${formatDurationMs(spanMs)} (${count} periodos). Las líneas unen solo muestras de esta ventana.`;
   document.querySelector("#adc-resolution").textContent = windowData.adc_resolution_bits;
   sourceBadge.dataset.source = windowData.source;
   sourceLabel.textContent = windowData.source === "simulated" ? "Simulación local" : "Hardware";
