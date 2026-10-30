@@ -51,3 +51,52 @@ D. VERSIONADO / CONVERGENCIA
 - Primero usar simuladores y pruebas de contrato, después activar hardware; un mock no cuenta como evidencia de medición real.
 - Pendientes obligatorios antes de congelar v1: configuración del sistema operativo y pinout de Raspberry Pi 4 Model B, placa física STM32L432KC y pines, obligación o no de copiar la lógica de frame del profesor, topología del backend, temporización de captura y espaciado SPI, decisión READY, secuencia comando/ACK/lectura, política timeout/retry, valor de N final, estrategia de parada ordenada y codificación de estados distinta del status=0 ya candidato.
 - Validar máquina de estados y preparación TX con Andrew, Pipe, Ferxxo y Checho; Valeria revisa señales/pines y Mateo los estados expuestos por HTTP. Los ejemplos JSON son propuestas, no servicios operativos.
+
+E. ACLARACIONES HTTP v0.2 - PROPUESTA PARA REVISION DE EQUIPO (2026-10-30)
+NO APROBADO / NO IMPLEMENTADO. Esta sección amplía C y no modifica las tramas SPI candidatas.
+Los tiempos y umbrales marcados como PROVISIONALES requieren medición y aprobación.
+
+E1. TIPOS / IDENTIDAD
+- session_id: string UUID v4 (minúsculas, con guiones), nuevo al iniciar el proceso backend o al restablecer una sesión tras reinicio/pérdida de estado del MCU. No cambia al recargar la página. La pareja (session_id, window_id) identifica una ventana.
+- window_id: entero JSON positivo e incremental por ventana adquirida/publicada en esa sesión, nunca por GET. Misma pareja implica misma ventana; puede haber saltos si se descartan capturas. No garantiza correlación exacta con el seq SPI de 8 bits.
+- config_revision: entero JSON >= 0; contador de configuración dentro de la sesión. Incrementa solo al confirmar la aplicación de un preset, incluso si la frecuencia seleccionada coincide con una previa. No aumenta si la aplicación falla.
+- captured_at: string ISO 8601 UTC con sufijo Z, p.ej. "2026-10-30T18:53:00.000Z". En v0.2 indica el instante en que el backend recibió/validó completamente la ventana, NO el instante físico exacto de muestreo; sincronización y timestamp del MCU quedan pendientes.
+- is_stale: boolean calculado por backend al atender GET: true si edad desde captured_at supera stale_threshold_ms. No significa que la trama sea corrupta. Capturas de config_revision anterior nunca se publican como ventana actual.
+- source: enum string "simulated" | "hardware" en todos los JSON de éxito que tengan cuerpo. No usar "hardware" para una confirmación del simulador.
+
+E2. RESPUESTAS (TODOS LOS EJEMPLOS SON CANDIDATOS)
+GET /api/v1/status -> 200, esquema:
+{"connected":true,"capture_status":"ready","sample_rate_hz":1000,"mcu":"stm32l432kc","source":"simulated","session_id":"c8248e7a-6282-439f-a087-e7c0f6a74244","config_revision":0}
+connected significa que el proveedor ACTIVO (simulador o MCU) responde; connected=true con source=simulated NO acredita enlace con el MCU. En modo simulado, mcu se refiere al dispositivo objetivo (no conectado); el frontend debe mostrar SIMULATED.
+capture_status enum: idle, configuring, capturing, ready, error, unavailable.
+idle: proveedor listo sin adquisición activa; configuring: SET_PRESET en curso; capturing: adquisición en curso; ready: ventana válida en revisión actual; error: fallo de adquisición/protocolo; unavailable: proveedor no accesible.
+Durante configuración: GET /status -> 200, capture_status=configuring, con sample_rate_hz y config_revision de la última configuración confirmada. connected se calcula del proveedor activo; un fallo de captura no implica necesariamente desconexión.
+
+POST /api/v1/acquisition/preset request {"sample_rate_hz":1000} -> 200 solo después de confirmar aplicación en el proveedor:
+{"sample_rate_hz":1000,"applied":true,"source":"simulated","session_id":"c8248e7a-6282-439f-a087-e7c0f6a74244","config_revision":1}
+En source=simulated, applied=true significa aplicado exclusivamente al simulador. En source=hardware significa SET_PRESET confirmado por el MCU conforme al ACK y semántica que se valide; NO garantiza que haya llegado una ventana nueva. Para una operación de preset concurrente o incompatible con captura en curso, responder 409; serializar el acceso a SPI. Si una captura previa ya estaba siendo transferida, descartarla al confirmar nueva configuración. Las solicitudes GET en curso pueden devolver la ventana previa: frontend debe verificar config_revision antes de representarla. Si POST falla, conservar revisión y preset confirmados; no retornar applied=true.
+
+GET /api/v1/window/latest -> 200 si existe ventana completa VALIDADA en revisión actual; ejemplo esquemático:
+{"session_id":"c8248e7a-6282-439f-a087-e7c0f6a74244","window_id":25,"config_revision":1,"captured_at":"2026-10-30T18:53:00.000Z","is_stale":false,"source":"simulated","sample_rate_hz":1000,"samples_per_channel":64,"adc_resolution_bits":12,"unit":"adc_counts","channels":{"ch1":[0,1],"ch2":[3,4]}}
+Los arrays son ESQUEMATICOS; respuesta operativa debe contener exactamente N enteros ADC [0..4095] por canal, N>=64, misma longitud. Las muestras corresponden a la revision vigente y a una sola captura, y sample_rate_hz es POR CANAL. window_id se mantiene si se solicita repetidamente la misma ventana.
+GET /window/latest -> 204 SIN CUERPO cuando proveedor activo accesible pero no hay ventana válida (inicio, captura todavía pendiente, o periodo de invalidación tras cambio). Si el proveedor no está disponible -> 503; si una operación que requiere respuesta del MCU excede el timeout -> 504; NO enmascarar fallos como 204.
+Política de ventanas: al CONFIRMAR cambio de preset, invalidar cache de la revisión anterior. No publicar una ventana nueva hasta asociarla de forma verificable a la nueva revisión. La verificación MCU/SPI para garantizar la asociación aún NO está diseñada/validada; no inferirla solo de sample_rate_hz.
+Frescura y sincronización: is_stale=true puede coexistir con HTTP 200; el frontend debe etiquetar ventana antigua y evitar llamarla captura en vivo. El frontend consulta cada ~2 s; evitar solicitudes solapadas.
+
+E3. ERRORES
+Para error HTTP con cuerpo: {"error":{"code":"ACQUISITION_BUSY","message":"Adquisicion ocupada","details":null}}
+error.code es string de enum; message es string legible; details es null u objeto JSON (nunca string/array/stacktrace).
+409 ACQUISITION_BUSY: conflicto de operación; opcional details.operation string.
+422 INVALID_PRESET: frecuencia no admitida/no habilitada; opcional details.requested_sample_rate_hz integer y details.allowed_sample_rates_hz array de enteros.
+503 MCU_UNAVAILABLE: proveedor hardware inaccesible; si falla el proveedor simulado se puede usar PROVIDER_UNAVAILABLE (503), sin atribuirlo falsamente al MCU.
+504 MCU_TIMEOUT: timeout de una operación hardware; para simulado se puede usar PROVIDER_TIMEOUT (504) si aplica.
+Errores 500 internos inesperados: INTERNAL_ERROR, sin incluir rastros internos en la respuesta.
+En errores de validación del cuerpo POST, mapear al esquema JSON uniforme y responder 422 INVALID_PRESET si corresponde.
+Headers: Content-Type application/json para cuerpos JSON; 204 no lleva cuerpo.
+
+E4. PARAMETROS PROVISIONALES Y VALIDACION PENDIENTE
+- stale_threshold_ms = 6000 PROVISIONAL, pensado para polling frontend cada 2000 ms. Debe medirse y aprobarse con backend/frontend/QA.
+- timeout de confirmación SET_PRESET hardware = 1000 ms PROVISIONAL; timeout de captura completa = 2000 ms PROVISIONAL (64 muestras a 100 Sa/s necesitan ~640 ms más latencia); validarlos con firmware/SPI, GPIO READY si se acuerda, escenarios desconectado/ocupado/CRC fallido.
+- Nunca declarar límites físicos finales con estos números. Definir política de retries y de operaciones SPI no idempotentes antes de congelar v1.
+- Pruebas de contrato mínimas: status simulado y hardware, cambios exitosos/fallidos, doble POST 409, ventana inicial 204, error real 503/504, repetición de GET sin cambiar id, cambio de revisión e invalidación, carrera GET/POST descartada en frontend, reinicio con nueva session_id, timestamp UTC/is_stale, arrays completos/rangos ADC y 40000 Sa/s deshabilitados hasta verificación.
+- Revisión obligatoria del equipo: frontend, backend, firmware y QA; formalizar mediante PR. Esta sección NO constituye aprobación de la API ni pruebas de hardware.
