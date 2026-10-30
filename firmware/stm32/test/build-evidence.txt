@@ -5,9 +5,9 @@ CONFIGURATION: https://docs.platformio.org/page/boards/ststm32/nucleo_l432kc.htm
 PLATFORM: ST STM32 (19.5.0) > ST Nucleo L432KC
 HARDWARE: STM32L432KCU6 80MHz, 64KB RAM, 256KB Flash
 DEBUG: Current (stlink) On-board (stlink) External (blackmagic, cmsis-dap, jlink)
-PACKAGES: 
- - framework-stm32cubel4 @ 1.18.1 
- - tool-ldscripts-ststm32 @ 0.2.0 
+PACKAGES:
+ - framework-stm32cubel4 @ 1.18.1
+ - tool-ldscripts-ststm32 @ 0.2.0
  - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
 LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
 LDF Modes: Finder ~ chain, Compatibility ~ soft
@@ -31,9 +31,9 @@ CONFIGURATION: https://docs.platformio.org/page/boards/ststm32/nucleo_l432kc.htm
 PLATFORM: ST STM32 (19.5.0) > ST Nucleo L432KC
 HARDWARE: STM32L432KCU6 80MHz, 64KB RAM, 256KB Flash
 DEBUG: Current (stlink) On-board (stlink) External (blackmagic, cmsis-dap, jlink)
-PACKAGES: 
- - framework-stm32cubel4 @ 1.18.1 
- - tool-ldscripts-ststm32 @ 0.2.0 
+PACKAGES:
+ - framework-stm32cubel4 @ 1.18.1
+ - tool-ldscripts-ststm32 @ 0.2.0
  - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
 LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
 LDF Modes: Finder ~ chain, Compatibility ~ soft

@@ -1,0 +1,12 @@
+﻿2026-10-30 — prueba ejecutada mediante ST-LINK detectado en Windows.
+PIO acquisition_test: programación y verificación OK.
+OpenOCD 0.12.0, STLINK V2J31M21, Cortex-M4 detectado, Vtarget aprox 3.26 V.
+ELF acquisition_test: acquisition_test_result=0x20000010, state=0x2000000c (nm).
+Lectura OpenOCD read_memory tras ejecución:
+acquisition_test_result = 0x0 (éxito de las comprobaciones target_test.c)
+state = 0x2 (ACQ_READY; ventana adicional de la aplicación completa).
+Incluye dos capturas por cada preset, rechazo de operaciones inválidas,
+no exposición de ventana incompleta, rango RAW y aborto controlado.
+No se conectaron ni midieron señales conocidas por esta tarea; no demuestra orden
+físico de canales, precisión de frecuencia, ruido, calibración ni comportamiento
+ante fallos físicos. No se modifica la matriz ni evidencia de Checho.

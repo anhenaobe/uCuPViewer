@@ -1,7 +1,7 @@
 ﻿# STM32 ADC + TIM2 + DMA — primer hito
 
 Responsable: Andrew. NUCLEO-L432KC asumida; confirmar placa y pinout con Valeria.
-Implementación compilada, sin mediciones físicas. No implementa SPI.
+Implementación compilada y pruebas de API ejecutadas en placa; tasas físicas no medidas. No implementa SPI.
 
 ## Construcción reproducible
 Instalar PlatformIO Core 6.2.0 y ejecutar desde la raíz:
@@ -10,8 +10,7 @@ pio run -d firmware/stm32 -e nucleo_l432kc
 pio run -d firmware/stm32 -e nucleo_l432kc -t upload
 pio debug -d firmware/stm32
 ```
-Conectar el USB ST-LINK integrado para upload/debug. No se ha programado una placa
-ni probado su ejecución. Dependencias efectivamente resueltas y fijadas en
+Conectar el USB ST-LINK integrado para upload/debug. Programación ST-LINK verificada y ejecución de pruebas confirmada por depurador. Dependencias efectivamente resueltas y fijadas en
 platformio.ini: ststm32 19.5.0, STM32CubeL4 1.18.1 (HAL 1.13.5), GCC ARM
 7.2.1/package 1.70201.0, linker scripts 0.2.0. Startup y SystemInit provienen del
 framework. La aplicación define una única implementación SysTick para HAL_IncTick.
@@ -67,7 +66,7 @@ T01: build ARM y enlace ejecutados. Revisar ELF con arm-none-eabi-nm: handlers
 ADC1, DMA1_Channel1 y SysTick presentes una vez; startup del framework.
 T02–T05: test/target_test.c contiene pruebas ejecutables en placa: presets inválidos,
 operaciones rechazadas, buffer no disponible durante captura, rango de valores,
-dos capturas consecutivas por preset, liberación y aborto. Aún NO ejecutadas.
+dos capturas consecutivas por preset, liberación y aborto. Ejecutadas en placa: retorno 0, ver evidencia de hardware.
 Ejecutar el entorno acquisition_test indicado abajo; requiere placa y entradas seguras. La prueba no
 verifica físicamente cadencia, ni demuestra ausencia general de corrupción.
 Para errores, desconectar/inyectar fallo de DMA bajo depurador, observar ERROR y
@@ -82,7 +81,7 @@ y contrastar su muestreo. Para medir TRGO, en una tarea de instrumentación pued
 sacarse un canal timer sincronizado: documentar su relación exacta con el trigger.
 El LED actual marca finalización/limpieza de ventana, no cada conversión ADC.
 Registrar instrumento, resolución, firmware SHA, montaje y tolerancias acordadas
-con Checho. No modificar sus resultados existentes. Sin evidencia de hardware aún.
+con Checho. No modificar sus resultados existentes. Cadencia y tensiones conocidas pendientes; ver evidencia limitada de hardware.
 
 ## Limitaciones e integración futura
 No timeout automático de captura: el cliente puede abortar mediante stop si DMA no
