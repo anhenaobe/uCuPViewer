@@ -15,7 +15,7 @@ const formatDurationMs = (value) => `${value.toLocaleString("es-CO", { maximumFr
 
 function displayWindow(windowData) {
   const rate = windowData.sample_rate_hz;
-  const spanMs = 64 / rate * 1000;
+  const spanMs = windowData.samples_per_channel / rate * 1000;
   document.querySelector("#sample-count").textContent = windowData.samples_per_channel;
   document.querySelector("#sample-rate-value").textContent = `${formatInteger(rate)} Sa/s`;
   document.querySelector("#window-span").textContent = formatDurationMs(spanMs);
@@ -33,7 +33,10 @@ function displayWindow(windowData) {
   errorMessage.textContent = "";
 }
 
+let latestFixtureRequestId = 0;
+
 async function loadFixture(sampleRateHz) {
+  const requestId = ++latestFixtureRequestId;
   stateLabel.textContent = "Cargando fixture…";
   errorMessage.hidden = true;
   try {
@@ -42,8 +45,10 @@ async function loadFixture(sampleRateHz) {
     if (!response.ok) throw new Error(`No se pudo cargar el fixture (HTTP ${response.status}).`);
     const windowData = validateWindow(await response.json(), sampleRateHz);
     if (windowData.source !== "simulated") throw new Error("El selector local solo carga fixtures simulados.");
+    if (requestId !== latestFixtureRequestId) return;
     displayWindow(windowData);
   } catch (error) {
+    if (requestId !== latestFixtureRequestId) return;
     stateLabel.textContent = "Fixture no disponible";
     stateLabel.classList.add("error-state");
     errorMessage.textContent = error instanceof Error ? error.message : "Ocurrió un error desconocido al cargar la vista previa.";
