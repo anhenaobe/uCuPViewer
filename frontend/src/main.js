@@ -1,0 +1,80 @@
+import { renderChannel } from "./plot.js";
+import { validateWindow } from "./validate.js";
+import { renderViewState } from "./ui-state.js";
+
+const presetSelect = document.querySelector("#sample-rate");
+const stateLabel = document.querySelector("#window-state");
+const errorMessage = document.querySelector("#error-message");
+const infoMessage = document.querySelector("#window-message");
+const plotCh1 = document.querySelector("#plot-ch1");
+const plotCh2 = document.querySelector("#plot-ch2");
+const sourceBadge = document.querySelector("#source-badge");
+const sourceLabel = document.querySelector("#source-label");
+const sourceDescription = document.querySelector("#source-description");
+const plotNote = document.querySelector("#plot-note");
+
+const viewElements = { stateLabel, infoMessage, errorMessage };
+
+function clearWindow() {
+  plotCh1.replaceChildren();
+  plotCh2.replaceChildren();
+  document.querySelector("#sample-count").textContent = "—";
+  document.querySelector("#sample-rate-value").textContent = "—";
+  document.querySelector("#window-span").textContent = "—";
+  plotNote.textContent = "El eje temporal aparecerá al cargar una ventana simulada.";
+}
+
+const formatInteger = (value) => value.toLocaleString("es-CO");
+const formatDurationMs = (value) => `${value.toLocaleString("es-CO", { maximumFractionDigits: 3 })} ms`;
+
+function displayWindow(windowData) {
+  const rate = windowData.sample_rate_hz;
+  const count = windowData.samples_per_channel;
+  const spanMs = count / rate * 1000;
+  const lastSampleMs = (count - 1) / rate * 1000;
+  document.querySelector("#sample-count").textContent = windowData.samples_per_channel;
+  document.querySelector("#sample-rate-value").textContent = `${formatInteger(rate)} Sa/s`;
+  document.querySelector("#window-span").textContent = formatDurationMs(spanMs);
+  plotNote.textContent = `Eje X: 0 a ${formatDurationMs(lastSampleMs)} (última muestra). Duración nominal: ${formatDurationMs(spanMs)} (${count} periodos). Las líneas unen solo muestras de esta ventana.`;
+  document.querySelector("#adc-resolution").textContent = windowData.adc_resolution_bits;
+  sourceBadge.dataset.source = windowData.source;
+  sourceLabel.textContent = windowData.source === "simulated" ? "Simulación local" : "Hardware";
+  sourceDescription.textContent = windowData.source === "simulated"
+    ? "Datos de fixtures locales; no hay conexión con hardware real. No son evidencia experimental."
+    : "Datos recibidos del hardware.";
+  renderChannel(plotCh1, windowData.channels.ch1, rate, "canal 1", "#57c7ee");
+  renderChannel(plotCh2, windowData.channels.ch2, rate, "canal 2", "#ffb765");
+  renderViewState(viewElements, "ready", {
+    windowLabel: `Ventana ${windowData.window_id} · ${windowData.samples_per_channel} muestras`,
+  });
+}
+
+let latestFixtureRequestId = 0;
+
+async function loadFixture(sampleRateHz) {
+  const requestId = ++latestFixtureRequestId;
+  clearWindow();
+  renderViewState(viewElements, "loading");
+  try {
+    const fixtureUrl = new URL(`../fixtures/window-${sampleRateHz}.json`, import.meta.url);
+    const response = await fetch(fixtureUrl);
+    if (!response.ok) throw new Error(`No se pudo cargar el fixture (HTTP ${response.status}).`);
+    const windowData = validateWindow(await response.json(), sampleRateHz);
+    if (windowData.source !== "simulated") throw new Error("El selector local solo carga fixtures simulados.");
+    if (requestId !== latestFixtureRequestId) return;
+    displayWindow(windowData);
+  } catch (error) {
+    if (requestId !== latestFixtureRequestId) return;
+    clearWindow();
+    renderViewState(viewElements, "error", {
+      message: error instanceof Error ? error.message : "Ocurrió un error desconocido al cargar la vista previa.",
+    });
+  }
+}
+
+presetSelect.addEventListener("change", () => {
+  const selectedRate = Number(presetSelect.value);
+  void loadFixture(selectedRate);
+});
+
+void loadFixture(Number(presetSelect.value));
