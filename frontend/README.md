@@ -25,12 +25,19 @@ El selector carga uno de los fixtures `fixtures/window-*.json`. Cambia la escala
 
 El eje horizontal usa `t[i] = i / sample_rate_hz`; el eje vertical presenta cuentas ADC de 12 bits. Cada gráfica corresponde a una ventana individual. La nota bajo las gráficas calcula el tiempo de la última muestra `(N-1)/fs` y distingue la duración nominal `N/fs`, incluso con ventanas de más de 64 muestras.
 
+## Estados visuales (preparación frontend)
+
+`src/ui-state.js` presenta `loading`, `ready`, `empty`, `stale` y `error` sin depender de HTTP.
+La vista previa actual solo produce `loading`, `ready` y `error` al cargar fixtures.
+Los estados `empty` y `stale` se prueban de forma aislada: **no** son respuestas de un backend implementado ni evidencia de hardware.
+Al cambiar el fixture o fallar una carga, se limpian las curvas y metadatos anteriores para no confundir datos previos con el nuevo preset.
+
 ## Pruebas frontend
 
 Desde la raíz del repositorio, ejecuta las pruebas de fixtures, validación, escala temporal y condiciones de carrera de la vista previa con el runner integrado de Node.js:
 
 ```powershell
-node --test tests/unit/frontend/validate.test.mjs tests/unit/frontend/time-axis.test.mjs tests/unit/frontend/preview.test.mjs
+node --test tests/unit/frontend/*.test.mjs
 ```
 
 En la Raspberry Pi, Apache o Nginx debe servir el contenido estático según la configuración de infraestructura del equipo. `server.mjs` no sustituye ese requisito.

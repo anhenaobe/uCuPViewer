@@ -1,15 +1,28 @@
 import { renderChannel } from "./plot.js";
 import { validateWindow } from "./validate.js";
+import { renderViewState } from "./ui-state.js";
 
 const presetSelect = document.querySelector("#sample-rate");
 const stateLabel = document.querySelector("#window-state");
 const errorMessage = document.querySelector("#error-message");
+const infoMessage = document.querySelector("#window-message");
 const plotCh1 = document.querySelector("#plot-ch1");
 const plotCh2 = document.querySelector("#plot-ch2");
 const sourceBadge = document.querySelector("#source-badge");
 const sourceLabel = document.querySelector("#source-label");
 const sourceDescription = document.querySelector("#source-description");
 const plotNote = document.querySelector("#plot-note");
+
+const viewElements = { stateLabel, infoMessage, errorMessage };
+
+function clearWindow() {
+  plotCh1.replaceChildren();
+  plotCh2.replaceChildren();
+  document.querySelector("#sample-count").textContent = "—";
+  document.querySelector("#sample-rate-value").textContent = "—";
+  document.querySelector("#window-span").textContent = "—";
+  plotNote.textContent = "El eje temporal aparecerá al cargar una ventana simulada.";
+}
 
 const formatInteger = (value) => value.toLocaleString("es-CO");
 const formatDurationMs = (value) => `${value.toLocaleString("es-CO", { maximumFractionDigits: 3 })} ms`;
@@ -31,18 +44,17 @@ function displayWindow(windowData) {
     : "Datos recibidos del hardware.";
   renderChannel(plotCh1, windowData.channels.ch1, rate, "canal 1", "#57c7ee");
   renderChannel(plotCh2, windowData.channels.ch2, rate, "canal 2", "#ffb765");
-  stateLabel.textContent = `Ventana ${windowData.window_id} · ${windowData.samples_per_channel} muestras`;
-  stateLabel.classList.remove("error-state");
-  errorMessage.hidden = true;
-  errorMessage.textContent = "";
+  renderViewState(viewElements, "ready", {
+    windowLabel: `Ventana ${windowData.window_id} · ${windowData.samples_per_channel} muestras`,
+  });
 }
 
 let latestFixtureRequestId = 0;
 
 async function loadFixture(sampleRateHz) {
   const requestId = ++latestFixtureRequestId;
-  stateLabel.textContent = "Cargando fixture…";
-  errorMessage.hidden = true;
+  clearWindow();
+  renderViewState(viewElements, "loading");
   try {
     const fixtureUrl = new URL(`../fixtures/window-${sampleRateHz}.json`, import.meta.url);
     const response = await fetch(fixtureUrl);
@@ -53,10 +65,10 @@ async function loadFixture(sampleRateHz) {
     displayWindow(windowData);
   } catch (error) {
     if (requestId !== latestFixtureRequestId) return;
-    stateLabel.textContent = "Fixture no disponible";
-    stateLabel.classList.add("error-state");
-    errorMessage.textContent = error instanceof Error ? error.message : "Ocurrió un error desconocido al cargar la vista previa.";
-    errorMessage.hidden = false;
+    clearWindow();
+    renderViewState(viewElements, "error", {
+      message: error instanceof Error ? error.message : "Ocurrió un error desconocido al cargar la vista previa.",
+    });
   }
 }
 
