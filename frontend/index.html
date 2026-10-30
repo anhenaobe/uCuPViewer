@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101820">
+    <meta name="description" content="Dashboard de adquisición de señales uCuPViewer.">
+    <title>uCuPViewer · Dashboard</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./src/main.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="uCuPViewer, inicio">
+        <span class="brand-mark" aria-hidden="true">uV</span>
+        <span>uCuPViewer</span>
+      </a>
+      <span class="course-label">Programación de Sistemas Linux Embebidos</span>
+    </header>
+
+    <main class="dashboard">
+      <section class="page-heading" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">Entrega 2 <span aria-hidden="true">·</span> Adquisición</p>
+          <h1 id="page-title">Monitor de adquisición</h1>
+          <p class="intro">Ventana discreta · dos canales ADC</p>
+        </div>
+        <div class="source-badge" id="source-badge" data-source="simulated" role="status" aria-live="polite">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span id="source-label">Simulación local</span>
+        </div>
+      </section>
+
+      <section class="notice" id="source-notice" aria-label="Origen de los datos">
+        <span class="notice-icon" aria-hidden="true">i</span>
+        <p id="source-description">Datos de fixtures locales; no hay conexión con hardware real. No son evidencia experimental.</p>
+      </section>
+
+      <section class="control-card" aria-labelledby="controls-title">
+        <div class="control-copy">
+          <p class="eyebrow">Datos de prueba locales</p>
+          <h2 id="controls-title">Datos de prueba</h2>
+        </div>
+        <label class="preset-control" for="sample-rate">
+          <span>Frecuencia simulada</span>
+          <select id="sample-rate" name="sample-rate">
+            <option value="100">100 Sa/s</option>
+            <option value="1000" selected>1.000 Sa/s</option>
+            <option value="10000">10.000 Sa/s</option>
+          </select>
+        </label>
+      </section>
+
+      <dl class="acquisition-meta" aria-label="Parámetros de adquisición">
+        <div class="meta-item">
+          <dt>Frecuencia</dt>
+          <dd id="sample-rate-value">—</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Muestras</dt>
+          <dd><span id="sample-count">—</span> <small>por canal</small></dd>
+        </div>
+        <div class="meta-item">
+          <dt>Duración nominal</dt>
+          <dd id="window-span">—</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Resolución</dt>
+          <dd><span id="adc-resolution">12</span> bits</dd>
+        </div>
+        <div class="meta-item">
+          <dt>Unidad</dt>
+          <dd>Cuentas ADC</dd>
+        </div>
+      </dl>
+
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">VENTANA ACTUAL</p>
+          <h2>Señales visualizadas</h2>
+        </div>
+        <span class="window-state" id="window-state" role="status" aria-live="polite">Cargando…</span>
+      </div>
+
+      <section class="plots-grid" aria-label="Gráficas de las señales">
+        <figure class="plot-card">
+          <figcaption>
+            <span class="channel-key channel-one" aria-hidden="true"></span>
+            <span><strong>CH1</strong><small>Canal 1 · Cuentas ADC</small></span>
+          </figcaption>
+          <svg id="plot-ch1" class="waveform-plot" role="img" aria-label="Gráfica simulada del canal 1"></svg>
+        </figure>
+        <figure class="plot-card">
+          <figcaption>
+            <span class="channel-key channel-two" aria-hidden="true"></span>
+            <span><strong>CH2</strong><small>Canal 2 · Cuentas ADC</small></span>
+          </figcaption>
+          <svg id="plot-ch2" class="waveform-plot" role="img" aria-label="Gráfica simulada del canal 2"></svg>
+        </figure>
+      </section>
+
+      <p class="plot-note">El eje X va de 0 a 63/fs; la duración nominal de los 64 periodos es 64/fs. Las líneas conectan solo muestras de esta ventana, nunca ventanas distintas.</p>
+      <p class="error-message" id="error-message" role="alert" hidden></p>
+
+      <footer class="page-footer">
+        <span>uCuPViewer · Frontend en desarrollo</span>
+        <span>Sin conexión a hardware</span>
+      </footer>
+    </main>
+  </body>
+</html>
