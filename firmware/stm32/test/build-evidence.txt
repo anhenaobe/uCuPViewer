@@ -1,0 +1,57 @@
+Processing nucleo_l432kc (platform: ststm32@19.5.0; board: nucleo_l432kc; framework: stm32cube)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/ststm32/nucleo_l432kc.html
+PLATFORM: ST STM32 (19.5.0) > ST Nucleo L432KC
+HARDWARE: STM32L432KCU6 80MHz, 64KB RAM, 256KB Flash
+DEBUG: Current (stlink) On-board (stlink) External (blackmagic, cmsis-dap, jlink)
+PACKAGES: 
+ - framework-stm32cubel4 @ 1.18.1 
+ - tool-ldscripts-ststm32 @ 0.2.0 
+ - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 57 compatible libraries
+Scanning dependencies...
+No dependencies
+Building in release mode
+Compiling .pio\build\nucleo_l432kc\src\acquisition.o
+Linking .pio\build\nucleo_l432kc\firmware.elf
+Checking size .pio\build\nucleo_l432kc\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [          ]   0.9% (used 568 bytes from 65536 bytes)
+Flash: [          ]   3.2% (used 8376 bytes from 262144 bytes)
+Building .pio\build\nucleo_l432kc\firmware.bin
+========================= [SUCCESS] Took 4.31 seconds =========================
+
+Processing acquisition_test (platform: ststm32@19.5.0; board: nucleo_l432kc; framework: stm32cube)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/ststm32/nucleo_l432kc.html
+PLATFORM: ST STM32 (19.5.0) > ST Nucleo L432KC
+HARDWARE: STM32L432KCU6 80MHz, 64KB RAM, 256KB Flash
+DEBUG: Current (stlink) On-board (stlink) External (blackmagic, cmsis-dap, jlink)
+PACKAGES: 
+ - framework-stm32cubel4 @ 1.18.1 
+ - tool-ldscripts-ststm32 @ 0.2.0 
+ - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 57 compatible libraries
+Scanning dependencies...
+No dependencies
+Building in release mode
+Compiling .pio\build\acquisition_test\src\acquisition.o
+Linking .pio\build\acquisition_test\firmware.elf
+Checking size .pio\build\acquisition_test\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [          ]   0.9% (used 572 bytes from 65536 bytes)
+Flash: [          ]   3.4% (used 8876 bytes from 262144 bytes)
+Building .pio\build\acquisition_test\firmware.bin
+========================= [SUCCESS] Took 5.08 seconds =========================
+
+Environment       Status    Duration
+----------------  --------  ------------
+nucleo_l432kc     SUCCESS   00:00:04.311
+acquisition_test  SUCCESS   00:00:05.076
+========================= 2 succeeded in 00:00:09.387 =========================
