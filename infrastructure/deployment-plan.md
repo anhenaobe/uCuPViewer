@@ -2,7 +2,7 @@
 
 ## Estado y alcance
 
-Este documento cubre la planificación inicial asignada a Ferxxo: inventario de plataforma, revisión del procedimiento SPI, propuesta de despliegue y controles de red y permisos. No implica que SPI, HTTP o el arranque automático funcionen. La guía individual indica que instalar servicios, escribir configuraciones o scripts y registrar resultados físicos corresponde a una tarea posterior.
+Este documento cubre la planificación y las plantillas de infraestructura solicitadas para Ferxxo. No implica que SPI, HTTP o el arranque automático funcionen. El instalador aún no se ha ejecutado en la Pi y no hay resultados físicos registrados.
 
 Plataforma seleccionada por el equipo: Raspberry Pi 4 Model B. El sistema operativo y la revisión de la placa real aún se deben registrar.
 
@@ -44,13 +44,15 @@ Nginx: archivos estáticos del frontend
 
 Nginx es la opción inicial propuesta. Debe servir los recursos del dashboard y enrutar `/api/` al backend. El backend no debe exponerse directamente a la LAN sin una necesidad revisada por el equipo.
 
-Antes de escribir una configuración concreta, acordar con Pipe el puerto, rutas y comportamiento de error del backend, y con Mateo el directorio y rutas del frontend. Revisar la semántica de `location` y `proxy_pass` para que la ruta API recibida por el backend coincida con el contrato. La directiva oficial `proxy_pass` admite destinos HTTP y permite transferir solicitudes a un servidor upstream.
+Antes de desplegar la configuración, acordar con Pipe el puerto, rutas y comportamiento de error del backend, y con Mateo el directorio y rutas del frontend. Revisar la semántica de `location` y `proxy_pass` para que la ruta API recibida por el backend coincida con el contrato. La directiva oficial `proxy_pass` admite destinos HTTP y permite transferir solicitudes a un servidor upstream.
 
 ## Servicios y operación futura
 
-Después de cerrar las dependencias, documentar para cada unidad systemd el usuario no privilegiado, ejecutable, directorio de trabajo, dependencias, política de reinicio y consulta de logs. Mantener secretos fuera de unidades versionadas. Limitar los permisos SPI/GPIO a lo necesario y documentar su reversión.
+La unidad systemd incluida usa un usuario no privilegiado, directorio de trabajo y `Restart=always`; requiere que Pipe integre `backend/main.py` antes de poder arrancar. Mantener secretos fuera de unidades versionadas. Limitar los permisos SPI/GPIO a lo necesario y documentar su reversión.
 
-La guía operativa futura debe cubrir instalación y versiones, validación de sintaxis de Nginx, habilitar/iniciar/reiniciar servicios, consulta de `systemctl status` y `journalctl`, reinicio de la Pi y acceso desde otro dispositivo de la LAN. Esta rama todavía no contiene unidades, configuraciones ni comandos validados para una imagen concreta.
+La plantilla de unidad, la configuración de Nginx y el instalador están en esta carpeta. El instalador es para revisión/uso en una Raspberry Pi 4; aún no se ha ejecutado en la placa real. No habilita el backend mientras falte `backend/main.py`; no hay unidad operativa hasta que Pipe acuerde e integre su entrypoint. El frontend actual tampoco aporta aún un `index.html` desplegable.
+
+Después de integrar backend/frontend, documentar versiones, validar `nginx -t`, consultar `systemctl status` y `journalctl`, reiniciar la Pi y confirmar acceso desde otro dispositivo de la LAN. La plantilla proxy usa puerto 5000 como valor provisional; coordinarlo con Pipe antes de desplegar.
 
 ## Evidencias pendientes
 
