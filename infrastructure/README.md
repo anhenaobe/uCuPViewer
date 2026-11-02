@@ -10,7 +10,7 @@ Esta carpeta prepara el despliegue en una Raspberry Pi 4 Model B para habilitar 
 - `nginx_ucupviewer.conf`: servidor estático y proxy `/api/` a loopback, puerto 5000 como valor provisional.
 - `ucupviewer-backend.service`: plantilla para el entrypoint Python `backend/main.py`.
 - `install_infra.sh`: instalador explícito para Raspberry Pi 4 con Nginx, `python3-spidev`, habilitación SPI y permisos de servicio.
-- [Plan de despliegue](deployment-plan.md) y [checklist](checklist.md).
+- [Plan de despliegue](deployment-plan.md), [checklist](checklist.md) y [registro de resultados SPI/red](spi_network_test_results.md).
 
 ## Uso previsto
 

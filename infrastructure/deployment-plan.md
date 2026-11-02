@@ -56,4 +56,4 @@ Después de integrar backend/frontend, documentar versiones, validar `nginx -t`,
 
 ## Evidencias pendientes
 
-Registrar SO/kernel, hardware, pinout confirmado, configuración SPI, frecuencias solicitadas y medidas, transacciones y errores, versiones de servicios, endpoint API, acceso desde un segundo dispositivo, reinicio y logs pertinentes. Separar límites teóricos de resultados medidos. Hasta ejecutar estas pruebas, el estado es **pendiente**, no PASS.
+Registrar SO/kernel, hardware, pinout confirmado, configuración SPI, frecuencias solicitadas y medidas, transacciones y errores, versiones de servicios, endpoint API, acceso desde un segundo dispositivo, reinicio y logs pertinentes. Usar la [plantilla de resultados SPI y red](spi_network_test_results.md). Separar límites teóricos de resultados medidos. Hasta ejecutar estas pruebas, el estado es **pendiente**, no PASS.
