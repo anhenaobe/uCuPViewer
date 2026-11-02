@@ -6,24 +6,24 @@ Esta carpeta prepara el despliegue en una Raspberry Pi 4 Model B para habilitar 
 
 ## Contenido
 
-- `spi_client.py`: framing CRC, parseo de ACK/ventanas y transporte `spidev` con modo 0, 8 bits, MSB-first, CS activo bajo y 1 MHz inicial.
-- `nginx/ucupviewer.conf`: servidor estático y proxy `/api/` a loopback, puerto 8000 como valor provisional.
-- `systemd/ucupviewer-backend.service`: plantilla para un backend Python en `backend/app.py`.
+- `spi_protocol.py`: framing CRC, parseo de ACK/ventanas, transporte `spidev` y simulador por fases.
+- `nginx_ucupviewer.conf`: servidor estático y proxy `/api/` a loopback, puerto 5000 como valor provisional.
+- `ucupviewer-backend.service`: plantilla para el entrypoint Python `backend/main.py`.
 - `install_infra.sh`: instalador explícito para Raspberry Pi 4 con Nginx, `python3-spidev`, habilitación SPI y permisos de servicio.
 - [Plan de despliegue](deployment-plan.md) y [checklist](checklist.md).
 
 ## Uso previsto
 
-Desde la raíz de un checkout en la Raspberry Pi, ejecutar `sudo bash ./infrastructure/install_infra.sh`. El script modifica configuración del sistema, instala paquetes y habilita Nginx. Si falta `backend/app.py`, deja la unidad instalada pero no la habilita; cuando Pipe integre el backend y su entrypoint, volver a ejecutarlo para activar el servicio. El frontend también debe aportar `frontend/index.html` antes de que haya un dashboard que servir.
+Desde la raíz de un checkout en la Raspberry Pi, ejecutar `sudo bash ./infrastructure/install_infra.sh`. El script modifica configuración del sistema, instala paquetes y habilita Nginx. Si falta `backend/main.py`, deja la unidad instalada pero no la habilita; cuando Pipe integre el backend y acuerde el entrypoint, volver a ejecutarlo para activar el servicio. El frontend también debe aportar `frontend/index.html` antes de que haya un dashboard que servir.
 
-Para seleccionar el puerto acordado con Pipe: `sudo env UCUPVIEWER_BACKEND_PORT=8000 bash ./infrastructure/install_infra.sh`. El backend debe escuchar únicamente en `127.0.0.1`.
+Para seleccionar el puerto acordado con Pipe: `sudo env UCUPVIEWER_BACKEND_PORT=5000 bash ./infrastructure/install_infra.sh`. El instalador configura el mismo puerto para Nginx y systemd; el backend debe leer `UCUPVIEWER_BACKEND_HOST` y `UCUPVIEWER_BACKEND_PORT` y escuchar únicamente en `127.0.0.1`.
 
-`SpiLink` expone transferencias separadas: `send_command(...)`, `receive_ack(opcode, sequence)` y `receive_window(sequence)`. Las dos últimas envían bytes dummy para producir reloj y recoger MISO. El llamador debe esperar entre fases según el handshake que se acuerde con firmware. El parser conserva el byte `status` sin asignarle significado porque sus valores aún no están congelados.
+`SpiLink` expone transferencias separadas: `send_command(...)`, `receive_ack(opcode, sequence)` y `receive_window(sequence)`. Las dos últimas envían bytes dummy para producir reloj y recoger MISO. El llamador debe esperar entre fases según el handshake que se acuerde con firmware. El parser conserva el byte `status` sin asignarle significado porque sus valores aún no están congelados. `MockSPIDevice` simula CMD, ACK y ventana en transacciones separadas; sus respuestas no son evidencia de hardware.
 
 Ejemplo de la secuencia candidata (no ejecutar contra hardware hasta acordar estados y tiempos con Andrew/Pipe):
 
 ```python
-from infrastructure.spi_client import OP_PING, OP_READ_WINDOW, SpiLink
+from infrastructure.spi_protocol import OP_PING, OP_READ_WINDOW, SpiLink
 
 sequence = 1
 with SpiLink(bus=0, device=0) as link:
@@ -37,6 +37,10 @@ with SpiLink(bus=0, device=0) as link:
     # Solicitar receive_window solo cuando el ACK confirme TX preparada.
     # window = link.receive_window(read_sequence)
 ```
+
+Para ver la demostración local del simulador, ejecutar `python3 infrastructure/spi_protocol.py`. Solo ejercita el modelo de software; no valida el bus ni equivale a una prueba del MCU.
+
+Cuando Pipe integre `backend/main.py` y se haya desplegado en la Pi, controlar el servicio con `sudo systemctl enable --now ucupviewer-backend.service`, `sudo systemctl restart ucupviewer-backend.service`, `sudo systemctl status ucupviewer-backend.service` y `sudo journalctl -u ucupviewer-backend.service -b`. El instalador no habilita el servicio antes de que exista el entrypoint.
 
 ## Límites y seguridad
 

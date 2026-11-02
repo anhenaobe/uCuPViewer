@@ -6,9 +6,12 @@ After=network.target
 Type=simple
 User=ucupviewer
 Group=ucupviewer
-WorkingDirectory=/opt/ucupviewer
+WorkingDirectory=/opt/ucupviewer/backend
 EnvironmentFile=-/etc/ucupviewer/backend.env
-ExecStart=/usr/bin/python3 /opt/ucupviewer/backend/app.py
+Environment=UCUPVIEWER_BACKEND_HOST=127.0.0.1
+Environment=UCUPVIEWER_BACKEND_PORT=5000
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /opt/ucupviewer/backend/main.py
 Restart=always
 RestartSec=3
 NoNewPrivileges=true

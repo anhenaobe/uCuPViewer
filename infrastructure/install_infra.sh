@@ -15,8 +15,9 @@ log() { printf '[ucupviewer] %s\n' "$*"; }
 die() { printf '[ucupviewer] ERROR: %s\n' "$*" >&2; exit 1; }
 
 [[ "$(id -u)" -eq 0 ]] || die "Run with sudo on the Raspberry Pi."
-[[ -f "${SCRIPT_DIR}/nginx/ucupviewer.conf" ]] || die "Nginx template not found beside this script."
-[[ -f "${SCRIPT_DIR}/systemd/ucupviewer-backend.service" ]] || die "systemd unit template not found beside this script."
+[[ -f "${SCRIPT_DIR}/nginx_ucupviewer.conf" ]] || die "Nginx template not found beside this script."
+[[ -f "${SCRIPT_DIR}/ucupviewer-backend.service" ]] || die "systemd unit template not found beside this script."
+[[ -f "${SCRIPT_DIR}/spi_protocol.py" ]] || die "SPI protocol module not found beside this script."
 
 if [[ -r /proc/device-tree/model ]]; then
     pi_model="$(tr -d '\0' </proc/device-tree/model)"
@@ -41,7 +42,7 @@ elif [[ -e /etc/nginx/sites-enabled/default ]]; then
     die "A non-symlink Nginx default site exists; review it manually before installing."
 fi
 
-backend_port="${UCUPVIEWER_BACKEND_PORT:-8000}"
+backend_port="${UCUPVIEWER_BACKEND_PORT:-5000}"
 [[ "$backend_port" =~ ^[0-9]{1,5}$ ]] || die "UCUPVIEWER_BACKEND_PORT must be an integer from 1 to 65535."
 backend_port=$((10#$backend_port))
 (( backend_port >= 1 && backend_port <= 65535 )) || die "UCUPVIEWER_BACKEND_PORT must be an integer from 1 to 65535."
@@ -100,14 +101,15 @@ install -d -o root -g "$SERVICE_USER" -m 0750 "${APP_ROOT}/backend"
 if [[ -d "${REPO_ROOT}/backend" ]]; then
     cp -a -- "${REPO_ROOT}/backend/." "${APP_ROOT}/backend/"
 fi
-install -m 0640 "${SCRIPT_DIR}/spi_client.py" "${APP_ROOT}/backend/spi_client.py"
+install -m 0640 "${SCRIPT_DIR}/spi_protocol.py" "${APP_ROOT}/backend/spi_protocol.py"
 chown -R root:"$SERVICE_USER" "${APP_ROOT}/backend"
 find "${APP_ROOT}/backend" -type d -exec chmod 0750 {} +
 find "${APP_ROOT}/backend" -type f -exec chmod 0640 {} +
 
 install -d -o root -g root -m 0755 "$WEB_ROOT"
 if [[ -d "${REPO_ROOT}/frontend" ]]; then
-    cp -a -- "${REPO_ROOT}/frontend/." "$WEB_ROOT/"
+    install -d -o root -g root -m 0755 "${WEB_ROOT}/frontend"
+    cp -a -- "${REPO_ROOT}/frontend/." "${WEB_ROOT}/frontend/"
 fi
 chown -R root:www-data "$WEB_ROOT"
 find "$WEB_ROOT" -type d -exec chmod 0755 {} +
@@ -123,8 +125,8 @@ if [[ -e "${NGINX_ENABLED}/ucupviewer.conf" || -L "${NGINX_ENABLED}/ucupviewer.c
     cp -a -- "${NGINX_ENABLED}/ucupviewer.conf" \
         "${NGINX_ENABLED}/ucupviewer.conf.backup.${timestamp}"
 fi
-sed "s/127\.0\.0\.1:8000/127.0.0.1:${backend_port}/" \
-    "${SCRIPT_DIR}/nginx/ucupviewer.conf" >"${NGINX_SITE}.tmp"
+sed "s/127\.0\.0\.1:5000/127.0.0.1:${backend_port}/" \
+    "${SCRIPT_DIR}/nginx_ucupviewer.conf" >"${NGINX_SITE}.tmp"
 chmod 0644 "${NGINX_SITE}.tmp"
 mv -f -- "${NGINX_SITE}.tmp" "$NGINX_SITE"
 ln -sfn -- "$NGINX_SITE" "${NGINX_ENABLED}/ucupviewer.conf"
@@ -147,7 +149,10 @@ fi
 if [[ -e "$SYSTEMD_UNIT" ]]; then
     cp -a -- "$SYSTEMD_UNIT" "${SYSTEMD_UNIT}.backup.${timestamp}"
 fi
-install -m 0644 "${SCRIPT_DIR}/systemd/ucupviewer-backend.service" "$SYSTEMD_UNIT"
+sed "s/UCUPVIEWER_BACKEND_PORT=5000/UCUPVIEWER_BACKEND_PORT=${backend_port}/" \
+    "${SCRIPT_DIR}/ucupviewer-backend.service" >"${SYSTEMD_UNIT}.tmp"
+chmod 0644 "${SYSTEMD_UNIT}.tmp"
+mv -f -- "${SYSTEMD_UNIT}.tmp" "$SYSTEMD_UNIT"
 install -d -o root -g root -m 0750 /etc/ucupviewer
 
 nginx -t
@@ -155,14 +160,14 @@ systemctl enable nginx
 systemctl restart nginx
 
 systemctl daemon-reload
-if [[ -f "${APP_ROOT}/backend/app.py" ]]; then
+if [[ -f "${APP_ROOT}/backend/main.py" ]]; then
     systemctl enable --now ucupviewer-backend.service
     log "Backend service enabled and started."
 else
-    log "Backend unit installed but not enabled: backend/app.py is not present yet. Coordinate the entry point with Pipe, then rerun this installer."
+    log "Backend unit installed but not enabled: backend/main.py is not present yet. Coordinate the entry point with Pipe, then rerun this installer."
 fi
 
-if [[ ! -f "${WEB_ROOT}/index.html" ]]; then
+if [[ ! -f "${WEB_ROOT}/frontend/index.html" ]]; then
     log "No frontend/index.html was found; Nginx is installed, but the dashboard is not deployable yet. Coordinate frontend build output with Mateo."
 fi
 
