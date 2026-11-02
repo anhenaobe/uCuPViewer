@@ -1,0 +1,25 @@
+[Unit]
+Description=uCuPViewer local backend
+After=network.target
+
+[Service]
+Type=simple
+User=ucupviewer
+Group=ucupviewer
+WorkingDirectory=/opt/ucupviewer
+EnvironmentFile=-/etc/ucupviewer/backend.env
+ExecStart=/usr/bin/python3 /opt/ucupviewer/backend/app.py
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+LockPersonality=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target
