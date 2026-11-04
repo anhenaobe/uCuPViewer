@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""API HTTP para Milk-V Duo S. Sin dependencias pip; Python 3 estándar.
+"""API HTTP para Milk-V Duo S; HTTP de desarrollo + proveedor SPI o simulador.
 Uso: python3 server.py --simulate
-     python3 server.py --device /dev/ttyS2
+     python3 server.py --device /dev/spidev3.0
 Source siempre marca si los datos vienen del simulador o del ADC real.
 """
 import argparse
@@ -14,7 +14,8 @@ import threading
 import time
 import uuid
 
-from protocol import SerialUART, ProtocolError, BusyError, RATE_TO_ID
+from protocol import ProtocolError, BusyError, RATE_TO_ID
+from spi_transport import SPITransport
 
 STALE_MS = 6000   # PROPUESTA a validar en el laboratorio
 
@@ -24,9 +25,11 @@ def utc_now():
 
 
 class Controller:
-    def __init__(self, source: str, device: str):
+    def __init__(self, source: str, device: str, spi_speed: int = 1000000, spi_ack_delay_ms: float = 5.0):
         self.source = source
         self.device = device
+        self.spi_speed = spi_speed
+        self.spi_ack_delay_ms = spi_ack_delay_ms
         self.rate = 1000
         self.session_id = str(uuid.uuid4())
         self.config_revision = 0
@@ -82,7 +85,7 @@ class Controller:
         try:
             if self.source == 'hardware':
                 if not self.io_lock.acquire(timeout=3.0):
-                    raise TimeoutError('Acceso UART bloqueado durante el cambio')
+                    raise BusyError('Bus SPI ocupado durante el cambio de preset')
                 try:
                     self.transport.set_preset(hz)
                 finally:
@@ -96,6 +99,10 @@ class Controller:
                 return {'sample_rate_hz':hz, 'applied':True,
                         'source':self.source,'session_id':self.session_id,
                         'config_revision':self.config_revision}
+        except BusyError as exc:
+            with self.lock:
+                self.capture_status = 'ready' if self.window else 'idle'
+            raise ApiError(409, 'ACQUISITION_BUSY', str(exc))
         except TimeoutError as exc:
             self._disconnect('MCU_TIMEOUT', str(exc))
             raise ApiError(504, 'MCU_TIMEOUT', str(exc))
@@ -111,7 +118,7 @@ class Controller:
             self.connected=False
             self.error=code
             self.capture_status='error' if code == 'MCU_TIMEOUT' else 'unavailable'
-        print(f'[UART] {code}: {message}', flush=True)
+        print(f'[SPI] {code}: {message}', flush=True)
         # Cerrado en el worker antes del siguiente intento de reconexión.
 
     def _publish(self, channels, session_id, revision, rate):
@@ -139,13 +146,15 @@ class Controller:
                 time.sleep(0.5)
                 continue
             try:
+                with self.lock:
+                    is_setting = self.setting
+                if is_setting:
+                    time.sleep(0.02)
+                    continue
                 with self.io_lock:
-                    with self.lock:
-                        if self.setting:
-                            continue
                     if self.transport is None:
                         # No fingir enlace hardware hasta validar una respuesta real del STM32.
-                        link = SerialUART(self.device)
+                        link = SPITransport(self.device, self.spi_speed, self.spi_ack_delay_ms)
                         try:
                             link.ping()
                             link.set_preset(self.rate)
@@ -169,6 +178,8 @@ class Controller:
                     channels = self.transport.capture_window(rate)
                     self._publish(channels,sid,revision,rate)
                 time.sleep(0.15)
+            except BusyError:
+                time.sleep(0.05)
             except TimeoutError as exc:
                 self._disconnect('MCU_TIMEOUT', str(exc))
                 if self.transport:
@@ -236,11 +247,13 @@ def main():
     parser=argparse.ArgumentParser()
     choice=parser.add_mutually_exclusive_group(required=True)
     choice.add_argument('--simulate',action='store_true')
-    choice.add_argument('--device',help='UART real, ej. /dev/ttyS2')
+    choice.add_argument('--device',help='SPI real, ej. /dev/spidev3.0, comprobar nodo real')
     parser.add_argument('--host',default='127.0.0.1')
     parser.add_argument('--port',type=int,default=8080)
+    parser.add_argument('--spi-speed-hz',type=int,default=1000000)
+    parser.add_argument('--spi-ack-delay-ms',type=float,default=5.0)
     a=parser.parse_args()
-    APIHandler.controller=Controller('simulated' if a.simulate else 'hardware',a.device or '')
+    APIHandler.controller=Controller('simulated' if a.simulate else 'hardware',a.device or '', a.spi_speed_hz, a.spi_ack_delay_ms)
     httpd=ThreadingHTTPServer((a.host,a.port),APIHandler)
     print(f'HTTP en http://{a.host}:{a.port}, source={APIHandler.controller.source}',flush=True)
     try: httpd.serve_forever()
