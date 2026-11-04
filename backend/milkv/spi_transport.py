@@ -35,7 +35,7 @@ class SPITransport:
             try:
                 import spidev
             except ImportError as exc:
-                raise RuntimeError('Falta Python spidev: instalar python3-spidev en la Milk-V') from exc
+                raise OSError('Falta Python spidev: instalar python3-spidev en la Milk-V') from exc
             adapter = spidev.SpiDev()
             adapter.open(int(match.group(1)), int(match.group(2)))
         self.spi = adapter
