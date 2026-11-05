@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Osciloscopio | Milk-V + STM32</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1320;--panel:#152235;--border:#30415b;--muted:#9badc3;--green:#59d9a3;--orange:#ffa662;--blue:#70bcff;--txt:#f4f7fb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:1150px;margin:auto;padding:22px 16px 40px}header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding-bottom:15px;border-bottom:1px solid var(--border)}h1{font-size:24px;letter-spacing:-.5px;margin:0}h2{font-size:16px;margin:0 0 10px}p{color:var(--muted);margin:6px 0 0}.tag{padding:9px 13px;border:1px solid var(--border);border-radius:25px;background:var(--panel);font-weight:650}.tag.ok{color:var(--green)}.tag.bad{color:#ff8c91}.top{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:17px 0}.panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:15px}.stat{font-size:23px;font-weight:700;margin-top:8px;letter-spacing:-.5px}.label{color:var(--muted);font-size:12px}.controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px;margin:15px 0}.controls label{color:var(--muted)}select{background:#0e1827;color:#fff;border:1px solid var(--border);padding:10px 12px;border-radius:8px;font:inherit}.plot{margin:14px 0}.plot-head{display:flex;align-items:center;justify-content:space-between}.legend{display:flex;gap:18px;color:var(--muted);font-size:12px}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}.canvasWrap{height:256px}canvas{display:block;width:100%;height:100%}.notice{padding:12px;background:#0f1b2d;border:1px solid var(--border);border-radius:8px;color:var(--muted);margin:12px 0;overflow-wrap:anywhere}.notice.error{border-color:#b55c61;color:#ffb1b6}.foot{font-size:12px;color:var(--muted);margin-top:20px}strong{color:var(--txt)}@media(max-width:780px){.top{grid-template-columns:repeat(2,minmax(0,1fr))}.canvasWrap{height:215px}h1{font-size:20px}}
+</style></head>
+<body><main>
+<header><div><h1>Osciloscopio de dos canales</h1><p>Milk-V Duo S · STM32L432KC · SPI por GPIO · ADC de 12 bits</p></div><div id="status" class="tag">Iniciando…</div></header>
+<div class="controls"><label for="preset">Frecuencia de muestreo</label><select id="preset"><option value="1">100 Sa/s</option><option value="2" selected>1.000 Sa/s</option><option value="3">10.000 Sa/s (experimental)</option></select><span style="color:var(--muted)">Ventanas: 64 muestras/canal · actualización: 4 s</span></div>
+<section class="top"><div class="panel"><div class="label">Muestreo nominal</div><div class="stat" id="hz">—</div></div><div class="panel"><div class="label">Tiempo de envío SPI</div><div class="stat" id="transfer">—</div></div><div class="panel"><div class="label">Velocidad SPI efectiva</div><div class="stat" id="bps">—</div></div><div class="panel"><div class="label">Número de captura</div><div class="stat" id="seq">—</div></div></section>
+<div class="notice" id="notice">Preparando adquisición…</div>
+<section class="panel plot"><div class="plot-head"><h2>Canal 1 · A0 / PA0</h2><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>CH1</span><span id="range1">—</span></div></div><div class="canvasWrap"><canvas id="ch1"></canvas></div></section>
+<section class="panel plot"><div class="plot-head"><h2>Canal 2 · A1 / PA1</h2><div class="legend"><span><i class="dot" style="background:var(--orange)"></i>CH2</span><span id="range2">—</span></div></div><div class="canvasWrap"><canvas id="ch2"></canvas></div></section>
+<p class="foot">Las gráficas muestran únicamente muestras reales recibidas con cabecera y CRC válidos. Los tiempos de captura son nominales hasta verificar el temporizador experimentalmente. Entradas ADC: 0–3,3 V, nunca tensiones negativas o desconocidas.</p>
+</main>
+<script>
+const $=id=>document.getElementById(id);let prevCycle=-1;let latest=null;
+function draw(canvas,values,hex,rate){
+  const dpr=Math.min(window.devicePixelRatio||1,2),r=canvas.getBoundingClientRect();
+  canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);
+  const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);const w=r.width,h=r.height;
+  ctx.clearRect(0,0,w,h);const left=48,right=18,top=15,bottom=33,cw=w-left-right,ch=h-top-bottom;
+  ctx.font='11px system-ui';ctx.strokeStyle='#30415b';ctx.lineWidth=1;ctx.fillStyle='#9badc3';
+  for(let k=0;k<=3;k++){let v=k*1.1,y=top+ch*(1-v/3.3);ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(left+cw,y);ctx.stroke();ctx.fillText(v.toFixed(1)+' V',5,y+4)}
+  for(let k=0;k<=4;k++){let x=left+cw*k/4;ctx.beginPath();ctx.moveTo(x,top);ctx.lineTo(x,top+ch);ctx.stroke();ctx.fillText(((values.length-1)/rate*k/4*1000).toFixed(1)+' ms',Math.max(left,x-18),h-10)}
+  if(!values.length)return;
+  ctx.beginPath();for(let i=0;i<values.length;i++){let x=left+cw*i/Math.max(1,values.length-1),y=top+ch*(1-values[i]/3.3);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)}
+  ctx.strokeStyle=hex;ctx.lineWidth=2.5;ctx.stroke();
+}
+function clearPlots(){draw($('ch1'),[],'#70bcff',1000);draw($('ch2'),[],'#ffa662',1000);}
+async function refresh(){
+  try{
+    let r=await fetch('/api/state',{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);let d=await r.json();
+    let ok=d.valid===true;let demo=d.source==='demo';$('status').textContent=demo?'● DEMO SIMULADA':(ok?'● Datos ADC válidos':(d.status==='adquiriendo'?'● Adquiriendo…':'● Sin datos válidos'));
+    $('status').className='tag '+(ok?'ok':d.status==='error'?'bad':'');
+    if(ok){
+      $('hz').textContent=d.rate_hz+' Sa/s';$('transfer').textContent=demo?'—':d.transfer_s.toFixed(2)+' s';$('bps').textContent=demo?'—':d.effective_bps+' bit/s';$('seq').textContent=d.sequence;
+      let a=d.samples.map(x=>x.ch1),b=d.samples.map(x=>x.ch2);
+      $('range1').textContent=Math.min(...a).toFixed(2)+'–'+Math.max(...a).toFixed(2)+' V';$('range2').textContent=Math.min(...b).toFixed(2)+'–'+Math.max(...b).toFixed(2)+' V';
+      latest={a,b,rate:d.rate_hz};draw($('ch1'),a,'#70bcff',d.rate_hz);draw($('ch2'),b,'#ffa662',d.rate_hz);
+      $('notice').className='notice';$('notice').textContent=(demo?'MODO DEMO: señales sintéticas, NO son datos de las placas':'Captura real validada por cabecera y CRC')+' · 64 muestras/canal · '+(new Date(d.last_update*1000)).toLocaleTimeString()+(d.requested_preset!==d.measured_preset?' · aplicando nuevo preset en la siguiente captura':'');
+    }else{
+      latest=null;clearPlots();$('range1').textContent='—';$('range2').textContent='—';$('hz').textContent='—';$('transfer').textContent='—';$('bps').textContent='—';$('seq').textContent='—';
+      $('notice').className='notice error';$('notice').textContent=d.error||'Esperando primera captura…';
+    }
+  }catch(e){$('status').textContent='● Servidor no disponible';$('status').className='tag bad';$('notice').className='notice error';$('notice').textContent=String(e);latest=null;clearPlots()}
+}
+$('preset').addEventListener('change',async e=>{try{const preset=Number(e.target.value);let r=await fetch('/api/preset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset})});if(!r.ok)throw Error('HTTP '+r.status);$('notice').textContent='Preset solicitado. Se aplicará en la próxima captura.'}catch(err){$('notice').textContent='Error seleccionando preset: '+err}});
+window.addEventListener('resize',()=>{if(latest){draw($('ch1'),latest.a,'#70bcff',latest.rate);draw($('ch2'),latest.b,'#ffa662',latest.rate)}else clearPlots()});clearPlots();refresh();setInterval(refresh,4000);
+</script></body></html>
