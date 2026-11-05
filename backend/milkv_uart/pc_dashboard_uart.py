@@ -169,7 +169,7 @@ class Web(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path in ('/','/index.html'):
-            self.send_body(200,(ROOT/'dashboard.html').read_bytes(),'text/html; charset=utf-8')
+            self.send_body(200,(ROOT.parents[1]/'frontend'/'uart_dashboard'/'dashboard.html').read_bytes(),'text/html; charset=utf-8')
         elif self.path=='/api/state':
             with STATE_LOCK:
                 data=dict(STATE)
