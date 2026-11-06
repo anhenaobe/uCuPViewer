@@ -16,17 +16,6 @@ El repositorio **ya tiene** `tests/milkv_uart/test_protocol_offline.py` y `tests
 | [`report/INFORME_VERIFICACION.tex`](report/INFORME_VERIFICACION.tex) | Plantilla final para Overleaf/PDF, con espacios para tres presets y enlace al video. |
 | `evidence/*` | Datos brutos, imágenes, registros y video/URL. |
 
-## Organización de los archivos de evidencia
-
-```text
-tests/evidence/
-  adc/           # Generador, mediciones temporales, RAW por canal, capturas
-  spi/           # Analizador lógico, SCLK/MOSI/MISO/CS, trama binaria y CRC
-  web/           # HTTP, consola, Network, Nginx/Apache, pantallas
-  integration/   # Sesiones completas y logs de recuperación
-  docs/          # Builds, inspección de código, esquemas, instrumentos
-  video/         # Metadatos y autorizaciones de la grabación (video en Drive)
-```
 
 ## Comandos seguros de comprobación offline
 
@@ -40,9 +29,6 @@ pio run -d firmware/stm32/spi_polling -e nucleo_l432kc
 
 **Precaución:** ambos comandos verifican software local; un `OK` o `SUCCESS` no demuestra ADC a la tasa real, niveles eléctricos, ni servidor HTTP en Milk-V. El informe previo registra doce tests offline OK; vuelve a ejecutar en tu propio commit y adjunta la salida antes de adjudicarte la ejecución.
 
-## Plantilla de registro de nueva prueba
-
-En `results/registro_pruebas.csv` completar una fila por intento, también si falla: ID, fecha, responsable, commit, preset, tipo de prueba, resultado, magnitudes, instrumento, enlace bruto y conclusiones. En `report/INFORME_VERIFICACION.tex` se incluyen fichas para mediciones ADC, SPI, HTTP y video.
 
 ## Video del osciloscopio
 
