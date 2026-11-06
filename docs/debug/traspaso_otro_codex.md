@@ -2,6 +2,12 @@
 
 ## Instrucción de trabajo
 
+Actualización posterior: se corrigió el reconocimiento de la consola UART y se
+verificó la página HTTP/API con datos reales y secuencias avanzando. Leer primero
+[validación del dashboard UART](milkv_dashboard_uart_validacion.md). Las menciones
+a dashboard pendiente en este traspaso describen el estado anterior; la inspección
+visual de los gráficos y las mediciones ADC siguen pendientes.
+
 Trabaja en anhenaobe/uCuPViewer. Andrew coordina firmware e integración. Recupera
 la rama **debug/milkv-usb-access**, no solo main. Lee este documento y los
 diagnósticos enlazados antes de actuar. Tu objetivo es repetir la recepción SPI,

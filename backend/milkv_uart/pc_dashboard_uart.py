@@ -12,6 +12,7 @@ import math
 import os
 import pathlib
 import queue
+import re
 import select
 import subprocess
 import sys
@@ -26,6 +27,15 @@ STATE = dict(status='iniciando',valid=False,error='Esperando la primera lectura 
              rate_hz=None,sequence=None,samples=[],transfer_s=None,
              effective_bps=None,last_update=None,cycle=0)
 SERIAL = None
+
+# Bash may prefix command output with OSC shell-integration and CSI sequences.
+CONSOLE_ESCAPE = re.compile(
+    r'\x1b\][^\x07\x1b]*(?:\x07|\x1b\\)|\x1b\[[0-?]*[ -/]*[@-~]'
+)
+
+
+def console_line(raw):
+    return CONSOLE_ESCAPE.sub('', raw.decode('utf-8', 'replace')).strip('\r\x00 ')
 
 
 class SerialPort:
@@ -58,7 +68,7 @@ class SerialPort:
                 while b'\n' in buf:
                     raw,_,rest = buf.partition(b'\n')
                     buf = bytearray(rest)
-                    line = raw.decode('utf-8','replace').strip('\r\x00 ')
+                    line = console_line(raw)
                     self.recent.append(line[:200])
                     if line.startswith('SCOPE_DATA '):
                         try:
