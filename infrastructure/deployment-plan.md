@@ -48,11 +48,11 @@ Antes de desplegar la configuración, acordar con Pipe el puerto, rutas y compor
 
 ## Servicios y operación futura
 
-La unidad systemd incluida usa un usuario no privilegiado, directorio de trabajo y `Restart=always`; requiere que Pipe integre `backend/main.py` antes de poder arrancar. Mantener secretos fuera de unidades versionadas. Limitar los permisos SPI/GPIO a lo necesario y documentar su reversión.
+La unidad systemd incluida usa un usuario no privilegiado, directorio de trabajo y `Restart=always`. El backend FastAPI y el dashboard ya están integrados en modo simulado; el instalador instala las dependencias Python en un entorno virtual y puede habilitar el servicio. Mantener secretos fuera de unidades versionadas. Limitar los permisos SPI/GPIO a lo necesario y documentar su reversión.
 
-La plantilla de unidad, la configuración de Nginx y el instalador están en esta carpeta. El instalador es para revisión/uso en una Raspberry Pi 4; aún no se ha ejecutado en la placa real. No habilita el backend mientras falte `backend/main.py`; no hay unidad operativa hasta que Pipe acuerde e integre su entrypoint. El frontend actual tampoco aporta aún un `index.html` desplegable.
+La plantilla de unidad, la configuración de Nginx y el instalador están en esta carpeta. El instalador es para revisión/uso en una Raspberry Pi 4; aún no se ha ejecutado en la placa real. El backend FastAPI y el frontend Chart.js responden con datos simulados. Su integración no demuestra SPI físico ni acceso LAN.
 
-Después de integrar backend/frontend, documentar versiones, validar `nginx -t`, consultar `systemctl status` y `journalctl`, reiniciar la Pi y confirmar acceso desde otro dispositivo de la LAN. La plantilla proxy usa puerto 5000 como valor provisional; coordinarlo con Pipe antes de desplegar.
+En la Pi, documentar versiones, validar `nginx -t`, consultar `systemctl status` y `journalctl`, reiniciar y confirmar acceso desde otro dispositivo de la LAN. La plantilla proxy usa puerto 5000 como valor provisional; coordinarlo con Pipe antes de desplegar.
 
 ## Evidencias pendientes
 

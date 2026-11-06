@@ -1,20 +1,24 @@
 # Infraestructura Linux
 
-**Estado:** plantillas y script preparados; no se han instalado en la Pi ni se han registrado pruebas de hardware o red.
+**Estado:** backend FastAPI y dashboard Chart.js disponibles en modo simulado; instalador y plantillas preparados. No se han instalado en la Pi ni se han registrado pruebas de hardware o red.
 
 Esta carpeta prepara el despliegue en una Raspberry Pi 4 Model B para habilitar SPI y publicar el dashboard mediante Nginx. El sistema operativo, el kernel y los detalles de integración deben registrarse antes de cerrar una configuración concreta.
 
 ## Contenido
 
 - `spi_protocol.py`: framing CRC, parseo de ACK/ventanas, transporte `spidev` y simulador por fases.
+- `../backend/main.py`: API FastAPI; por defecto produce ventanas del simulador y no declara conexión con hardware.
+- `../frontend/index.html`, `../frontend/app.js`: dashboard Chart.js, presets simulados y refresco de 1–4 segundos.
 - `nginx_ucupviewer.conf`: servidor estático y proxy `/api/` a loopback, puerto 5000 como valor provisional.
-- `ucupviewer-backend.service`: plantilla para el entrypoint Python `backend/main.py`.
-- `install_infra.sh`: instalador explícito para Raspberry Pi 4 con Nginx, `python3-spidev`, habilitación SPI y permisos de servicio.
+- `ucupviewer-backend.service`: plantilla para el entrypoint FastAPI `backend/main.py`.
+- `install_infra.sh`: instalador explícito para Raspberry Pi 4 con Nginx, entorno virtual Python, `python3-spidev`, habilitación SPI y permisos de servicio.
 - [Plan de despliegue](deployment-plan.md), [checklist](checklist.md) y [registro de resultados SPI/red](spi_network_test_results.md).
 
 ## Uso previsto
 
-Desde la raíz de un checkout en la Raspberry Pi, ejecutar `sudo bash ./infrastructure/install_infra.sh`. El script modifica configuración del sistema, instala paquetes y habilita Nginx. Si falta `backend/main.py`, deja la unidad instalada pero no la habilita; cuando Pipe integre el backend y acuerde el entrypoint, volver a ejecutarlo para activar el servicio. El frontend también debe aportar `frontend/index.html` antes de que haya un dashboard que servir.
+Desde la raíz de un checkout en la Raspberry Pi, ejecutar `sudo bash ./infrastructure/install_infra.sh`. El script modifica configuración del sistema, instala paquetes y dependencias Python en un entorno virtual, y habilita Nginx. Habilita el servicio backend si está presente `backend/main.py` y sirve `frontend/index.html` si está presente. La API y el dashboard actuales operan en modo simulado; el endpoint no controla el MCU.
+
+Para una demostración rápida en el checkout, instalar `backend/requirements.txt` en un entorno virtual y ejecutar `python backend/main.py`. La API queda en `http://127.0.0.1:5000`; abre `frontend/index.html` en el navegador. El modo `file://` apunta explícitamente a esa API local. Para despliegue normal, Nginx sirve el frontend y enruta `/api/` al backend.
 
 Para seleccionar el puerto acordado con Pipe: `sudo env UCUPVIEWER_BACKEND_PORT=5000 bash ./infrastructure/install_infra.sh`. El instalador configura el mismo puerto para Nginx y systemd; el backend debe leer `UCUPVIEWER_BACKEND_HOST` y `UCUPVIEWER_BACKEND_PORT` y escuchar únicamente en `127.0.0.1`.
 
@@ -40,7 +44,7 @@ with SpiLink(bus=0, device=0) as link:
 
 Para ver la demostración local del simulador, ejecutar `python3 infrastructure/spi_protocol.py`. Solo ejercita el modelo de software; no valida el bus ni equivale a una prueba del MCU.
 
-Cuando Pipe integre `backend/main.py` y se haya desplegado en la Pi, controlar el servicio con `sudo systemctl enable --now ucupviewer-backend.service`, `sudo systemctl restart ucupviewer-backend.service`, `sudo systemctl status ucupviewer-backend.service` y `sudo journalctl -u ucupviewer-backend.service -b`. El instalador no habilita el servicio antes de que exista el entrypoint.
+Después del despliegue en la Pi, controlar el servicio con `sudo systemctl enable --now ucupviewer-backend.service`, `sudo systemctl restart ucupviewer-backend.service`, `sudo systemctl status ucupviewer-backend.service` y `sudo journalctl -u ucupviewer-backend.service -b`.
 
 ## Límites y seguridad
 

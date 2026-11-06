@@ -106,12 +106,12 @@ No publicar una IP privada real en este documento. Usar un hostname o marcador; 
 
 ## 6. systemd y arranque automático
 
-La unidad backend requiere que Pipe acuerde e integre `backend/main.py`. Mientras no exista, el instalador deja la unidad instalada pero no la habilita; registrarlo como `BLOCKED`, no como `FAIL` ni `PASS`.
+`backend/main.py` y el entrypoint systemd ya están integrados en modo simulado. El despliegue y arranque en la Raspberry Pi siguen sin ejecutarse; mantener `NOT_RUN` hasta registrar evidencia en la placa. La integración de simulación no demuestra SPI físico.
 
 | Servicio | `systemctl status` | Habilitado al inicio | Logs revisados | Estado / evidencia |
 |---|---|---|---|---|
 | `nginx.service` | Pendiente | Pendiente | Pendiente | `NOT_RUN` |
-| `ucupviewer-backend.service` | Pendiente / entrypoint pendiente | Pendiente | Pendiente | `BLOCKED` hasta integrar backend |
+| `ucupviewer-backend.service` | Plantilla y backend simulado integrados; despliegue pendiente | Pendiente | Pendiente | `NOT_RUN` |
 
 - Validación de config Nginx (`nginx -t`): pendiente
 - Reinicio de la Pi y hora de prueba: pendiente
