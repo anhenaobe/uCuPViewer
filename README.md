@@ -1,42 +1,57 @@
-# Linux 2 · uCuPViewer
+﻿# uCuPViewer — STM32 + Milk-V
 
-Proyecto universitario de adquisición de dos señales analógicas con STM32L432KC y visualización HTTP desde Raspberry Pi 4 Model B mediante SPI.
+Desarrollo actual del equipo: adquisición de dos canales en STM32L432KC, comunicación
+SPI por GPIO con Milk-V y visualización HTTP. Milk-V reemplaza definitivamente a
+Raspberry Pi4, descartada por problemas de conexión/inicialización.
 
-**Estado: planificación técnica; contrato v0.2 propuesto, pendiente de aprobación. Firmware, SPI, backend y dashboard todavía no están integrados ni validados. No hay resultados experimentales registrados.**
+**Estado:** código actual importado y compilación/pruebas offline disponibles; no
+se ha validado físicamente esta integración. El ZIP implementa polling ADC y trama
+SC264. La interfaz SPI convencional de la Milk-V del montaje no está disponible;
+se conserva bit-banging. Causa/alcance de la restricción pendientes de evidencia.
 
-Repositorio existente: [anhenaobe/uCuPViewer](https://github.com/anhenaobe/uCuPViewer). `main` contiene la versión integrada; el desarrollo se presenta mediante ramas por tarea y Pull Requests.
+## Código actual
+- `firmware/stm32/spi_polling/`: firmware actual del ZIP, proyecto independiente.
+- `backend/milkv_uart/`: capturador Milk-V GPIO y puente UART/HTTP PC.
+- `frontend/uart_dashboard/`: dashboard del desarrollo importado.
+- `tests/milkv_uart/`: pruebas offline del protocolo.
 
-## Plataforma seleccionada
+El servidor HTTP importado corre en PC; servir desde el SBC continúa pendiente.
+El código identifica Milk-V Duo S y menciona Debian, pero modelo físico y sistema
+instalado requieren confirmación. No se usa SPI hardware Milk-V como requisito.
 
-STM32L432KC es la única plataforma de desarrollo. La evaluación inicial de Valeria favorece STM32 por ADC, temporización, DMA, SPI y simplicidad de integración. ESP32-S3 queda como comparación histórica, sin desarrollo ni pruebas obligatorias.
+## Documentación vigente del desarrollo
+- [Arquitectura real y procedencia](docs/architecture/estado_actual.md).
+- [SPI por software](docs/protocol/spi_software.md).
+- [Trama SC264](docs/protocol/frame_sc.md).
+- [Estado ADC y problemas pendientes](docs/reviews/estado_firmware.md).
+- [Roles](docs/02_roles_responsabilidades.txt) y [flujo Git](docs/06_flujo_git.txt).
 
-Decisión técnica inicial: Visual Studio Code + PlatformIO, STM32Cube HAL, CMSIS como soporte de bajo nivel y STM32 LL cuando convenga para periféricos críticos. Arquitectura bare-metal con máquina de estados, sin RTOS inicial. La justificación y fuentes están en [la nota técnica](docs/04_eleccion_mcu_y_pruebas.txt). No se ha creado `platformio.ini` ni firmware; la placa física, pinout, herramientas y versiones se confirmarán antes de configurarlos.
+[Contrato v0.2](docs/03_contratos_interfaces_v0_2.txt) y [decisión anterior](docs/04_eleccion_mcu_y_pruebas.txt)
+son propuestas previas. SC264 es referencia actual; revisión coordinada con Andrew,
+Pipe, Ferxxo y Checho pendiente, sin imponer268 B ni cambiar paquetes silenciosamente.
+Se mantienen requisitos100/1000/10000 Sa/s por canal; su precisión debe medirse.
 
-## Requisitos y acuerdos propuestos
+## Implementación previa y preservación
+`firmware/stm32/src/` conserva ADC+TIM2+DMA y sus evidencias anteriores. No se mezcla
+con main polling; resolver esa coexistencia será tarea separada. Backend/frontend
+preexistentes e infraestructura de otros integrantes no se sustituyen.
+`reference/profesor/` conserva código atribuido al docente sin cambios.
+La [matriz histórica](docs/05_matriz_verificacion_inicial.txt) y resultados de Checho
+no se reinterpretan como validación del desarrollo actual.
 
-- Dos canales ADC de 12 bits; ventana mínima de 64 muestras por canal, RAW en `uint16_t`, intercaladas CH1/CH2 y little-endian. La adquisición secuencial no implica simultaneidad.
-- Presets de 100, 1.000 y 10.000 Sa/s por canal; 40.000 Sa/s por canal es un objetivo adicional sujeto a medición.
-- Raspberry Pi controla SPI; STM32L432KC es periférico. Modo 0, 8 bits, MSB-first, CS bajo y SCLK inicial de 1 MHz son candidatos sin validación física.
-- Dashboard servido por Apache o Nginx, con refresco entre 1 y 4 segundos, inicialmente 2 segundos. Esa cadencia es independiente de la adquisición ADC.
-- Estimación teórica y contraste experimental de SPI; documentación, matriz de verificación, evidencias, video, aportes e interacciones con IA.
+## Comprobaciones sin placas
+```
+pio run -d firmware/stm32/spi_polling -e nucleo_l432kc
+python -B tests/milkv_uart/test_protocol_offline.py
+```
+La rama de diagnóstico añade el handler SysTick que faltaba al firmware importado.
+El [diagnóstico físico](docs/debug/milkv_spi_diagnostico.md) registra el bloqueo
+en la STM32 conectada y las pruebas iniciales de recepción de ceros. Con autorización
+de Andrew se programó la versión corregida: [tres transferencias físicas válidas](docs/debug/milkv_validacion_post_systick.md)
+con CRC y secuencias consecutivas. La imagen anterior se conserva respaldada.
+Las tasas ADC y tensiones de entrada siguen pendientes de validación.
 
-El [contrato activo v0.2](docs/03_contratos_interfaces_v0_2.txt) es la única fuente de detalles de trama y API. Captura terminada y transferencia SPI preparada son condiciones distintas. READY, tiempos y secuencia ACK siguen provisionales.
-
-## Documentación
-
-- [Revisión del esqueleto del profesor](docs/01_revision_esqueleto_profesor.txt).
-- [Roles compartidos](docs/02_roles_responsabilidades.txt) y guías por integrante: [Andrew](docs/por_integrante/andrew.txt), [Valeria](docs/por_integrante/valeria.txt), [Checho](docs/por_integrante/checho.txt), [Mateo](docs/por_integrante/mateo.txt), [Pipe](docs/por_integrante/pipe.txt) y [Ferxxo](docs/por_integrante/ferxxo.txt).
-- [Contrato v0.2](docs/03_contratos_interfaces_v0_2.txt), [elección técnica y ensayos previstos](docs/04_eleccion_mcu_y_pruebas.txt), [matriz de verificación](docs/05_matriz_verificacion_inicial.txt).
-- [Flujo Git](docs/06_flujo_git.txt) y [registro de aportes e IA](docs/07_aportes_ia.txt).
-
-## Estructura y próximo hito
-
-- `firmware/stm32/`: espacio reservado para firmware futuro.
-- `hardware/`: pinout, montaje y caracterización eléctrica futura.
-- `backend/`, `frontend/`, `infrastructure/`: espacios de trabajo de Linux/SPI, dashboard y servicios HTTP; su existencia no demuestra funcionamiento.
-- `tests/`: espacio para pruebas y evidencias futuras.
-- `reference/profesor/`: fuentes C/C++/Rust y diagrama originales atribuidos al docente. No modificarlos ni atribuirlos al equipo.
-
-Primero revisar contratos y placa/pines; después preparar configuración y pruebas con mocks mediante tareas separadas. Esta actualización solo documenta decisiones y prepara `.gitignore`; la implementación debe esperar revisión.
-
-No sobrescribir trabajo de compañeros ni cambiar PASS/FAIL sin evidencia original. Los cambios de contratos requieren revisión de responsables afectados. Conservar fuentes, scripts, linker scripts y configuración propia; excluir compilaciones, cachés y secretos. Confirmar permiso del docente antes de redistribuir públicamente su referencia. Ver [atribución original](reference/profesor/ORIGEN.txt).
+Repositorio: [anhenaobe/uCuPViewer](https://github.com/anhenaobe/uCuPViewer).
+Desarrollo por ramas/PR hacia main, sin sobrescribir aportes ni alterar PASS/FAIL
+sin evidencia. ZIP original intacto fuera de Git; procedencia y autoría individual
+no inferida se detallan en el documento de arquitectura.
