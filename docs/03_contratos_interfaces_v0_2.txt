@@ -1,3 +1,5 @@
+NOTA DE VIGENCIA 2026-11-05: documento de planificación anterior. Milk-V reemplaza definitivamente a Raspberry Pi en el montaje; SPI convencional Milk-V no disponible, se usa GPIO. La implementación actual es SC264 y ADC polling: ver docs/architecture/estado_actual.md, docs/protocol/frame_sc.md y docs/protocol/spi_software.md. La revisión de este contrato/plan requiere Andrew, Pipe, Ferxxo y Checho; no se imponen268 B ni DMA al desarrollo actual. Contenido previo conservado a continuación para trazabilidad.
+
 CONTRATOS DE INTERFAZ Y DATOS - PROPUESTA v0.2 | 2026-10-29
 ESTADO: PROPUESTA DE NEGOCIACIÓN. NO SE CONSIDERA CONGELADA HASTA APROBACIÓN POR EQUIPO Y PRUEBA SPI ENTRE SBC/MCU.
 Único contrato activo; sustituye la propuesta anterior, conservada en el historial Git.
