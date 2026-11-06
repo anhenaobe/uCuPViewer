@@ -208,25 +208,3 @@ La matriz completa con 38 criterios y estados diferenciados está en [MATRIZ_VER
 ## 8. Video de demostracion y evidencia en Google Drive
 https://drive.google.com/drive/folders/1vyMeNPnM6CrxiDLAD2U4zudmMIFRan2V?usp=drive_link
 
-| Sección del video | Marca de tiempo (mm:ss) | Qué debe aparecer en el video | Archivo de medida complementario |
-|---|---|---|---|
-| Montaje y conexión | `[00:00]` | Milk-V, STM32, dos señales, GND, enlace SPI, navegador | `[ruta pendiente]` |
-| **100 Sa/s** | `[mm:ss]` | Selección preset 1, 64 muestras por canal, CH1 y CH2 con señales reales; mostrar instrumento que pruebe período si es posible | `[ruta pendiente]` |
-| **1.000 Sa/s** | `[mm:ss]` | Preset 2, ventana/seq y formas de onda reales; medición temporal separada | `[ruta pendiente]` |
-| **10.000 Sa/s** | `[mm:ss]` | Preset 3; demostrar una ventana válida y **medir** tasa; documentar cualquier `0x17` sin ocultarlo | `[ruta pendiente]` |
-| Transmisión y servidor | `[mm:ss]` | Lectura SPI, HTTP desde Milk-V/Apache o Nginx, refresco en navegador | `[ruta pendiente]` |
-| Errores y recuperación (opcional) | `[mm:ss]` | Trama inválida/pérdida controlada y comportamiento UI | `[ruta pendiente]` |
-
-**Advertencia metodológica:** mostrar el texto «10.000 Sa/s» en un selector prueba únicamente la interfaz. Para acreditar **la tasa real**, adjuntar medición temporal independiente (analizador lógico, señal de test con temporización validada, instrumento y cálculo documentado). Un video en Drive no sustituye datos brutos ni capturas de osciloscopio/analizador.
-
-### Dictamen de verificación del video — completar después de revisarlo
-
-- [ ] El enlace existe y sus permisos fueron probados desde una sesión ajena al propietario.
-- [ ] Se reconocen físicamente ambas placas y el montaje.
-- [ ] Se muestran CH1/CH2 y al menos 64 muestras por canal.
-- [ ] Se ven **tres segmentos diferenciados**: 100, 1000, 10000 Sa/s.
-- [ ] La evidencia de cada tasa es una **medición** y no solo un valor nominal.
-- [ ] La interfaz funciona desde HTTP servido en el SBC, si así se exige en la entrega.
-- [ ] El resultado se consignó en `RV-05`, `RV-06`, `RV-07`, `RV-20` y `RV-24` con las limitaciones observadas.
-
-**Revisor:** `[POR COMPLETAR]` · **Fecha de revisión:** `[POR COMPLETAR]` · **Dictamen:** `NOT_RUN`.
