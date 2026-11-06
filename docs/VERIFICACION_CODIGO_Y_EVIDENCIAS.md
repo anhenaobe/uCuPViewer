@@ -206,17 +206,7 @@ La matriz completa con 38 criterios y estados diferenciados está en [MATRIZ_VER
 | RV-24 | **Sin archivo de video identificado en `main`** | Video Drive con todas las tasas y el montaje |
 
 ## 8. Video de demostracion y evidencia en Google Drive
-
-> **ESTADO: PENDIENTE. NO SE HA INSERTADO NINGÚN ENLACE REAL.** Completar esta sección después de grabar y subir el video. El enlace debe permitir al docente abrirlo sin solicitar acceso, según la política del equipo.
-
-**Enlace al video completo del osciloscopio en Google Drive:**
-
-`[PEGAR_AQUI_ENLACE_REAL_DE_GOOGLE_DRIVE]`
-
-**Responsable de grabación:** `[POR COMPLETAR]`  
-**Fecha:** `[POR COMPLETAR]`  
-**Commit/versiones probadas:** `[POR COMPLETAR]`  
-**Placas y sistema operativo identificados en video:** `[POR COMPLETAR]`
+https://drive.google.com/drive/folders/1vyMeNPnM6CrxiDLAD2U4zudmMIFRan2V?usp=drive_link
 
 | Sección del video | Marca de tiempo (mm:ss) | Qué debe aparecer en el video | Archivo de medida complementario |
 |---|---|---|---|
