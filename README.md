@@ -44,11 +44,11 @@ no se reinterpretan como validación del desarrollo actual.
 pio run -d firmware/stm32/spi_polling -e nucleo_l432kc
 python -B tests/milkv_uart/test_protocol_offline.py
 ```
-El firmware importado tiene un posible bloqueo SysTick documentado; compilar no
-significa que se pueda ejecutar correctamente. No seguir instrucciones originales
-de programación sin revisar el proyecto completo. Pruebas físicas requieren permiso
-y confirmación de conexión. El siguiente trabajo es resolver arranque y sincronización,
-no sustituir automáticamente las arquitecturas actuales.
+La rama de diagnóstico añade el handler SysTick que faltaba al firmware importado.
+El [diagnóstico físico](docs/debug/milkv_spi_diagnostico.md) registra el bloqueo
+en la STM32 conectada y las pruebas reales de recepción de ceros. El binario instalado
+es distinto del proyecto local; la corrección no se ha flasheado. No seguir instrucciones
+originales de programación sin resolver esa correspondencia. Compilar no valida SPI.
 
 Repositorio: [anhenaobe/uCuPViewer](https://github.com/anhenaobe/uCuPViewer).
 Desarrollo por ramas/PR hacia main, sin sobrescribir aportes ni alterar PASS/FAIL

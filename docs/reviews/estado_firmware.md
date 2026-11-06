@@ -1,5 +1,10 @@
 ﻿# Estado del firmware STM32 actual
 
+Actualización de diagnóstico: se añadió el handler SysTick en un archivo separado.
+Las observaciones de importación siguientes describen el estado anterior a esa
+corrección. Ver [evidencia física y validación actual](../debug/milkv_spi_diagnostico.md)
+para distinguir el firmware instalado del proyecto local corregido.
+
 El ZIP contiene trabajo actual del equipo, no código externo descartable. Se
 integra sin cambios en firmware/stm32/spi_polling/src/main.c. Su proyecto PlatformIO
 independiente evita sobrescribir firmware/stm32/src/acquisition.c y main.c previos.
