@@ -1,0 +1,39 @@
+ID,Criterio,Código,Prueba realizada,Resultado / alcance,Ensayo,Fuente en main,Observación
+RV-01,Sistema Milk-V Duo S + STM32L432KC,SI,SI,PARCIAL,F-IN01,firmware/stm32/spi_polling/src/main.c; docs/debug/milkv_dashboard_uart_validacion.md,Ruta física SPI→UART→HTTP en PC probada; servidor final en SBC pendiente
+RV-02,Dos señales analógicas diferenciadas,SI,PARCIAL,PARCIAL,F-AD01,firmware/stm32/spi_polling/src/main.c; docs/debug/milkv_validacion_post_systick.md,PA0/PA1 leídos; faltan dos entradas patrón conocidas independientes
+RV-03,Captura y almacenamiento de ventanas,SI,SI,CUMPLE_ACOTADO,F-AD02,firmware/stm32/spi_polling/src/main.c; docs/debug/milkv_validacion_post_systick.md,Tres ventanas SC264 completas recibidas a preset nominal 1000
+RV-04,Al menos 64 muestras por canal,SI,SI,CUMPLE_ACOTADO,F-AD02,firmware/stm32/spi_polling/src/main.c; docs/debug/milkv_validacion_post_systick.md,64 pares comprobados en tres transferencias; faltan ensayos en cada tasa
+RV-05,100 Sa/s por canal,SI,NO,PENDIENTE,F-AD03,firmware/stm32/spi_polling/src/main.c,"Preset codificado, sin medición temporal independiente ni video"
+RV-06,1000 Sa/s por canal,SI,PARCIAL,PARCIAL,F-AD03,firmware/stm32/spi_polling/src/main.c; docs/debug/milkv_dashboard_uart_validacion.md,Capturas en preset 2 observadas; tasa real no medida
+RV-07,10000 Sa/s por canal,SI,SI,INCIDENCIA,F-AD03; F-AD04,firmware/stm32/spi_polling/src/main.c; docs/debug/milkv_dashboard_uart_validacion.md,Observado 0x17 (periodo perdido); estabilidad/tasa no demostradas
+RV-08,Frecuencia de muestreo constante,PARCIAL,PARCIAL,PENDIENTE,F-AD04,firmware/stm32/spi_polling/src/main.c,TIM2 indica periodo nominal pero ADC por polling; falta jitter medido
+RV-09,Selección de preset mediante SPI,SI,SI,PARCIAL,F-SP04,firmware/stm32/spi_polling/src/main.c; docs/debug/milkv_dashboard_uart_validacion.md,Cambio del preset 3 a 2 observado por API/SPI; tasa real no medida
+RV-10,Enlace SBC-MCU por SPI,SI,SI,CUMPLE_ACOTADO,F-SP01,docs/debug/milkv_validacion_post_systick.md,Tres tramas físicas SC264 válidas; no prueba estrés ni trazas SCLK
+RV-11,Límite teórico SPI plataforma SBC,NA,NO,PENDIENTE,D-SPI01,docs/protocol/spi_software.md,Distinguir capacidad de hardware de SPI bit-banging; faltan fuentes/cálculo final
+RV-12,Límite teórico SPI STM32,NA,NO,PENDIENTE,D-SPI01,firmware/stm32/README.md,Falta hoja de datos y condiciones de operación trazadas al ensayo
+RV-13,Velocidad SPI experimental,PARCIAL,PARCIAL,PARCIAL,F-SP03,docs/debug/milkv_validacion_post_systick.md,"Dos tiempos reales; no hay SCLK independiente, carga ni estadística"
+RV-14,Dashboard HTTP servido por SBC,PARCIAL,PARCIAL,PENDIENTE,F-WEB01,backend/milkv_uart/pc_dashboard_uart.py; docs/debug/milkv_dashboard_uart_validacion.md,"HTTP demostrado en PC/VM, no servidor alojado en Milk-V"
+RV-15,Apache o Nginx en SBC,NO,NO,PENDIENTE,D-WEB01; F-SYS01,infrastructure/nginx_ucupviewer.conf; infrastructure/README.md,Plantilla histórica para Raspberry; despliegue Milk-V no demostrado
+RV-16,Refresco gráfico cada 1–4 s,PARCIAL,NO,PENDIENTE,F-WEB02,backend/milkv_uart/milkv_stream.py; frontend/uart_dashboard/dashboard.html,Cadencia nominal de capturas; actualización visual real no cronometrada
+RV-17,Equipo de máximo seis integrantes,NA,PARCIAL,PENDIENTE,D-DOC01,docs/02_roles_responsabilidades.txt,Hay seis roles registrados; falta revisión/cierre del equipo
+RV-18,Roles y coordinación documentados,NA,PARCIAL,PARCIAL,D-DOC01,docs/02_roles_responsabilidades.txt,Tareas asignadas existen; aportes verificados individuales incompletos
+RV-19,Pruebas unitarias SBC y MCU,PARCIAL,SI,PARCIAL,D-TEST01,tests/milkv_uart/test_protocol_offline.py; tests/milkv_uart/test_uart_console.py; firmware/stm32/test/,Pruebas offline y compilación previas; faltan evidencias suficientes para todos los módulos
+RV-20,Integración completa sistema,PARCIAL,PARCIAL,PARCIAL,F-IN01,docs/debug/milkv_dashboard_uart_validacion.md,Integración hasta HTTP PC probada; servidor SBC y navegador final pendientes
+RV-21,Repositorio reproducible,NA,PARCIAL,PENDIENTE,D-DOC02,README.md; docs/architecture/estado_actual.md,Faltan fuentes completas instaladas en Milk-V y despliegue documentado
+RV-22,"Descripción, arquitectura y diagramas",NA,PARCIAL,PENDIENTE,D-DOC02,docs/architecture/estado_actual.md; reference/profesor/,Documento de arquitectura sí; diagrama del sistema vigente por verificar
+RV-23,"Requisitos, restricciones y verificación",NA,NO,PENDIENTE,D-DOC02,docs/05_matriz_verificacion_inicial.txt,Se prepara paquete QA en esta rama; no constituye integración ni aprobación
+RV-24,Video demostrativo,NA,NO,PENDIENTE,D-DOC03,docs/VERIFICACION_CODIGO_Y_EVIDENCIAS.md (nuevo en verificationmatrix),No se encontró video ni enlace en tree de main; Drive pendiente de añadir
+RV-25,Declaración de aportes individuales,NA,NO,PENDIENTE,D-DOC01,docs/02_roles_responsabilidades.txt; docs/por_integrante/,Roles asignados no acreditan contribuciones reales; fichas sin completar
+RV-26,Declaración de uso de IA,NA,NO,PENDIENTE,D-DOC01,docs/07_aportes_ia.txt,Plantilla existente; faltan interacciones/documentación final de cada persona
+RV-27,Bonificación >=40000 Sa/s,NO,NO,PENDIENTE,F-AD06,firmware/stm32/spi_polling/src/main.c,Preset 40000 no existe en firmware polling actual
+RD-01,Plataformas vigentes coherentes,NA,PARCIAL,PARCIAL,D-DOC02,README.md; docs/architecture/estado_actual.md,Milk-V + STM32 reconocidos; infraestructura aún menciona Raspberry
+RD-03,Contrato SC264 documentado,SI,SI,PARCIAL,D-SP02,docs/protocol/frame_sc.md; tests/milkv_uart/test_protocol_offline.py,Documentado y probado offline; pendiente aprobación formal del equipo
+RD-04,"CRC, longitud, estado y orden",SI,SI,PARCIAL,F-SP02,backend/milkv_uart/milkv_stream.py; tests/milkv_uart/test_protocol_offline.py,CRC/longitud/estado/RAW validados; no se detectan saltos de secuencia
+RD-05,Niveles y protección eléctrica,NA,PARCIAL,PENDIENTE,F-HW01,docs/debug/milkv_spi_diagnostico.md,"Pinout investigado; niveles reales, continuidad y entradas seguras pendientes"
+RD-06,Desfase entre canales,SI,NO,PENDIENTE,F-AD05,firmware/stm32/spi_polling/src/main.c,CH1/CH2 secuenciales; desfase no cuantificado
+RD-07,Estados y datos reales distinguibles,SI,PARCIAL,PARCIAL,F-WEB03,backend/milkv_uart/pc_dashboard_uart.py; frontend/uart_dashboard/dashboard.html,source=hardware/demo presente; prueba visual pendiente
+RD-08,Trazabilidad de versiones y resultados,NA,PARCIAL,PENDIENTE,D-DOC02,docs/debug/milkv_validacion_post_systick.md,Registros identificados; falta consolidación y responsable de cada prueba
+RD-09,SPI GPIO explicado y comprobado,SI,PARCIAL,PARCIAL,D-SPI01; F-SP01,docs/protocol/spi_software.md; docs/debug/milkv_validacion_post_systick.md,Código y prueba funcional; temporización eléctrica instrumental pendiente
+RD-10,Despliegue HTTP en Duo S,NO,NO,PENDIENTE,F-SYS01,infrastructure/install_infra.sh; infrastructure/README.md,Archivos de despliegue anteriores para Raspberry; no ejecutar en Duo S
+RD-11,Recuperación frente a fallos,PARCIAL,SI,PARCIAL,F-IN02,docs/debug/milkv_dashboard_uart_validacion.md; tests/milkv_uart/test_uart_console.py,Recuperación UART observada y tests; falta campaña de inyección de fallos
+RD-12,Suficiencia de transporte SPI por GPIO,SI,PARCIAL,PENDIENTE,F-SP03,docs/debug/milkv_validacion_post_systick.md,"1,783/1,791 s observados; falta prueba repetibilidad y refresco; meta 200 ms histórica, no vigente"

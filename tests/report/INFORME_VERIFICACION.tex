@@ -1,0 +1,200 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=23mm]{geometry}
+\usepackage{xcolor,graphicx,hyperref,booktabs,longtable,array,fancyhdr,float,listings,enumitem}
+\usepackage{microtype}
+\definecolor{azul}{HTML}{1A4F74}
+\hypersetup{colorlinks=true,linkcolor=azul,urlcolor=azul}
+\setlength{\headheight}{15pt}\pagestyle{fancy}\fancyhf{}\lhead{uCuPViewer | Verificación}\rhead{Milk-V Duo S + STM32L432KC}\cfoot{\thepage}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,frame=single,columns=fullflexible,showstringspaces=false}
+\newcommand{\Pendiente}{\textcolor{red!60!black}{\textbf{PENDIENTE}}}
+\newcommand{\Registro}[3]{%
+\subsection{#1 -- #2}
+\noindent\textbf{Requisitos relacionados:} #3\\
+\textbf{Estado:} \Pendiente\quad \textbf{Responsable:} \underline{\hspace{35mm}}\\
+\textbf{Fecha / commit:} \underline{\hspace{60mm}}\\
+\textbf{Instrumento o herramienta:} \underline{\hspace{75mm}}
+\paragraph{Procedimiento ejecutado} Describir exactamente los pasos realizados, la configuración y número de repeticiones.
+\paragraph{Resultados} Indicar valor objetivo, medida, unidad, tolerancia adoptada previamente, cálculo y dictamen.
+\paragraph{Evidencia} Enlazar rutas o insertar una imagen/captura y señalar qué demuestra; no inferir más de lo medido.\par\medskip
+\noindent\textbf{Archivo/URL:} \texttt{tests/evidence/\ldots}\\
+\textbf{Conclusión y límites:} \underline{\hspace{95mm}}\par\bigskip}
+\newcommand{\EvidenciaImagen}[2]{\begin{figure}[H]\centering\IfFileExists{#1}{\includegraphics[width=.90\linewidth]{#1}}{\fbox{\parbox[c][35mm][c]{.83\linewidth}{\centering EVIDENCIA PENDIENTE\\\texttt{\detokenize{#1}}}}}\caption{#2}\end{figure}}
+\title{\textbf{Informe de verificación experimental y documental}\\\large uCuPViewer: Milk-V Duo S + STM32L432KC}
+\author{Equipo: \underline{\hspace{45mm}}}
+\date{Base revisada: main 41601d45f7\\ Fecha de cierre: \underline{\hspace{33mm}}\\ Versión del contrato: \underline{\hspace{24mm}}}
+\begin{document}
+\maketitle
+\begin{abstract}
+\noindent\textbf{Estado de esta plantilla:} sin resultados inventados. Completar únicamente con medidas y revisiones realizadas. Diferenciar simulación, compilación, prueba en placa y ensayo físico del sistema integrado.
+\end{abstract}
+\tableofcontents\newpage
+\section{Identificación del montaje y trazabilidad}
+\begin{longtable}{p{50mm}p{105mm}}\toprule
+Campo & Valor documentado\\\midrule
+SBC / revisión & Milk-V Duo S / \underline{\hspace{45mm}}\\
+Linux (kernel / imagen) & \underline{\hspace{80mm}}\\
+CPU/arquitectura de arranque & \underline{\hspace{80mm}}\\
+MCU / placa & STM32L432KC / \underline{\hspace{45mm}}\\
+Firmware (SHA y compilador) & \underline{\hspace{80mm}}\\
+Backend/frontend (SHA) & \underline{\hspace{80mm}}\\
+SPI: GPIO, modo, pinout & \underline{\hspace{80mm}}\\
+Servidor web / versión & \underline{\hspace{80mm}}\\
+Instrumentación / calibración & \underline{\hspace{80mm}}\\
+\bottomrule\end{longtable}
+
+\section{Método y criterios adoptados}
+El docente exige dos canales, ventanas de al menos 64 muestras, presets 100, 1.000 y 10.000 Sa/s, muestreo constante, SPI, servidor HTTP y refresco entre 1 y 4 segundos. Para verificación conservadora se adoptan 64 muestras y las tasas por canal (confirmar con el docente).
+
+\subsection{Estado y contrato de la implementación actual}
+La implementación integrada usa 64 pares CH1/CH2 de 12 bits almacenados como
+\texttt{uint16}, cabecera SC de seis bytes y CRC16 de dos bytes: 264 bytes en
+cada transferencia. El primer byte del maestro solicita un preset de la próxima
+captura, sin ACK ni READY independientes. El STM32 actual usa TIM2 y
+\emph{polling} ADC; el código ADC+DMA previo se conserva en otra ruta.
+
+El presupuesto anterior de 200 ms por SPI fue una \emph{propuesta de ingeniería}
+y no una exigencia académica ni resultado demostrado. En una sesión física el
+maestro C completó dos lecturas de 264 B en 1,783 y 1,791 s. La
+frecuencia real de SCLK requiere un instrumento de medición. No confundir estas
+latencias con la tasa de conversión ADC.
+
+\[
+  R_{\rm util} = \frac{256\ \mathrm{bytes}}{T_{\rm SPI}},
+  \qquad
+  \varepsilon_{f} = 100\frac{f_{\rm medida}-f_{\rm objetivo}}{f_{\rm objetivo}}.
+\]
+Las tasas obligatorias nominales 100, 1.000 y 10.000 Sa/s por canal requieren
+medición externa y tolerancia acordada antes de dictamen.
+
+\section{Pruebas físicas y funcionales}
+\Registro{F-HW01}{Montaje, niveles eléctricos y asignación de pines}{RD-05 / R-05}
+\Registro{F-AD01}{Dos entradas analógicas distinguibles}{RV-02}
+\Registro{F-AD02}{Integridad de ventanas y longitud mínima}{RV-03 / RV-04}
+\Registro{F-AD03}{Frecuencias nominales 100, 1.000 y 10.000 Sa/s}{RV-05 / RV-06 / RV-07}
+\Registro{F-AD04}{Constancia de muestreo y variación temporal}{RV-08}
+\Registro{F-AD05}{Desfase entre canales multiplexados}{RD-06}
+\Registro{F-AD06}{Bonificación: 40.000 Sa/s}{RV-27 / BON-01}
+\Registro{F-SP01}{SPI por GPIO: modo, secuencias y niveles}{RV-10 / RD-09}
+\Registro{F-SP02}{Integridad de tramas SC264, CRC, secuencia y errores}{RD-03 / RD-04}
+\Registro{F-SP03}{Rendimiento real y repetibilidad de SPI por GPIO}{RV-11 / RV-12 / RV-13 / RD-12}
+\noindent\textbf{Tabla de repetibilidad SPI (datos medidos):}
+\begin{center}\begin{tabular}{lrrrr}\toprule
+Preset & N & Media [ms] & p95 [ms] & Máx. [ms]\\\midrule
+100 Sa/s & -- & -- & -- & --\\
+1.000 Sa/s & -- & -- & -- & --\\
+10.000 Sa/s & -- & -- & -- & --\\\bottomrule\end{tabular}\end{center}
+\Registro{F-SP04}{Cambio real del preset desde la interfaz SPI}{RV-09}
+\Registro{F-WEB01}{Dashboard HTTP servido desde Milk-V, no solo PC}{RV-14 / RV-15}
+\Registro{F-WEB02}{Cadencia de actualización gráfica}{RV-16}
+\Registro{F-WEB03}{Estados visibles y datos no simulados}{RD-07}
+\Registro{F-IN01}{Integración hasta HTTP en SBC y navegador final}{RV-01 / RV-20}
+\Registro{F-IN02}{Robustez ante desconexión y errores}{RD-11}
+\Registro{F-SYS01}{Arranque y servicio web reproducibles en Milk-V}{RD-10}
+
+\section{Verificaciones de código, configuración y documentos}
+La evidencia puede consistir en un \textbf{fragmento de código, nombre de archivo, commit y una prueba de compilación} (no es obligatorio un instrumento físico). Registrar qué demuestra y qué NO demuestra cada fragmento.
+
+\subsection{Implementación actual: TIM2 y adquisición secuencial}
+\noindent\textbf{Ruta:} \texttt{firmware/stm32/spi\_polling/src/main.c}\\
+\textbf{Base:} \texttt{41601d45f7}. \textbf{Símbolos:} \texttt{rate\_hz},
+\texttt{prepare\_frame}, \texttt{slave\_transfer}.\\
+\textbf{Demuestra:} selección de períodos nominales y detección de periodos
+perdidos; no demuestra la frecuencia efectiva.
+\begin{lstlisting}[language=C]
+uint32_t period_us = 1000000u / rate_hz();
+htim2.Init.Prescaler = 15;
+htim2.Init.Period = period_us - 1u;
+/* La lectura ADC se inicia por software tras observar TIM2. */
+\end{lstlisting}
+\noindent\textbf{Referencia fuente:}
+\href{https://github.com/anhenaobe/uCuPViewer/blob/41601d45f71fb994444670fc85fe28a7be1d0a50/firmware/stm32/spi_polling/src/main.c}{Código STM32 en GitHub, commit 41601d45f7}
+
+\EvidenciaImagen{../evidence/docs/ejemplo_build.png}{Ejemplo de imagen de compilación: insertar evidencia real y explicar su alcance.}
+\Registro{D-SPI01}{Teoría de SPI y plataforma}{RV-11/12, RD-09}
+\Registro{D-SP02}{Contrato SPI aprobado}{RD-03/04}
+\Registro{D-WEB01}{Servicio web implementado}{RV-15}
+\Registro{D-TEST01}{Pruebas unitarias}{RV-19}
+\Registro{D-DOC01}{Equipo y declaraciones}{RV-17/18/25/26}
+\Registro{D-DOC02}{Especificación y reproducibilidad}{RV-21/22/23}
+\Registro{D-DOC03}{Video y demostración}{RV-24}
+
+\section{Pruebas previas localizadas en GitHub, sin repetición en este informe}
+\subsection{SPI físico: validación limitada}
+Registro documental del proyecto: dos transferencias del maestro C de 264 bytes,
+con tiempos 1,783 y 1,791 s, secuencias 1 y 2; una transferencia Python adicional
+secuencia 3. Las tres fueron registradas con cabecera SC y CRC válidos.
+\url{https://github.com/anhenaobe/uCuPViewer/blob/main/docs/debug/milkv_validacion_post_systick.md}
+\textbf{Límite:} no se midió aquí SCLK ni tasa ADC ni se realizó un ensayo de 100 ventanas.
+
+\subsection{HTTP provisional en PC/VM y fallos observados}
+Registro documental: 64 pares por captura, API con \texttt{source=hardware},
+37 capturas válidas y dos errores de JSON UART; un error \texttt{0x17} en
+el preset nominal de 10.000 Sa/s seguido de recuperación al preset 1.000.
+El HTTP observado se servía desde PC/VM, no desde Milk-V con Apache/Nginx.
+\url{https://github.com/anhenaobe/uCuPViewer/blob/main/docs/debug/milkv_dashboard_uart_validacion.md}
+
+\section{Video de demostración: 100, 1000 y 10000 Sa/s}
+\noindent\textbf{Enlace real a Google Drive:}\par\smallskip
+\noindent\fbox{\parbox{.88\linewidth}{\centering \textbf{PENDIENTE: PEGAR AQUÍ URL DE DRIVE}\par
+\vspace{5mm}\hrulefill}}\par\medskip
+\noindent\textbf{Responsable / fecha / SHA:} \underline{\hspace{65mm}}\\
+\textbf{Permisos comprobados por:} \underline{\hspace{65mm}}\par\medskip
+\begin{center}
+\begin{tabular}{p{27mm}p{26mm}p{92mm}}
+\toprule
+Modo nominal & Momento video & Evidencia obligatoria a mostrar\\\midrule
+100 Sa/s & --:-- & 64 pares por canal, señales reales y medición temporal\\
+1000 Sa/s & --:-- & 64 pares, señales reales y medición temporal\\
+10000 Sa/s & --:-- & 64 pares, señales reales, manejo de 0x17 y medición temporal\\
+Servidor / SPI & --:-- & Milk-V, STM32, trama y HTTP en SBC si está desplegado\\
+\bottomrule
+\end{tabular}
+\end{center}
+\textbf{Advertencia:} ver 10000 en una pantalla no demuestra que el ADC alcance
+10000 muestras/s. Anexar instrumento, método y datos a \texttt{tests/evidence/adc/}.
+La guía editable y casilla central del video está en
+\texttt{docs/VERIFICACION\_CODIGO\_Y\_EVIDENCIAS.md}, sección 8.
+
+\section{Consolidación y dictamen}
+\begin{longtable}{p{20mm}p{24mm}p{20mm}p{72mm}}\toprule
+Ensayo & Estado (P/C/NC/B) & Fecha & Evidencia / nota\\\midrule\endhead
+F-HW01 & P & -- & --\\
+F-AD01 & P & -- & --\\
+F-AD02 & P & -- & --\\
+F-AD03 & P & -- & --\\
+F-AD04 & P & -- & --\\
+F-AD05 & P & -- & --\\
+F-AD06 & P & -- & --\\
+F-SP01 & P & -- & --\\
+F-SP02 & P & -- & --\\
+F-SP03 & P & -- & --\\
+F-SP04 & P & -- & --\\
+F-WEB01 & P & -- & --\\
+F-WEB02 & P & -- & --\\
+F-WEB03 & P & -- & --\\
+F-IN01 & P & -- & --\\
+F-IN02 & P & -- & --\\
+F-SYS01 & P & -- & --\\
+D-SPI01 & P & -- & --\\
+D-SP02 & P & -- & --\\
+D-WEB01 & P & -- & --\\
+D-TEST01 & P & -- & --\\
+D-DOC01 & P & -- & --\\
+D-DOC02 & P & -- & --\\
+D-DOC03 & P & -- & --\\
+\bottomrule\end{longtable}
+
+\section{Limitaciones, incidentes y acciones correctivas}
+Registrar mediciones inconclusas, condiciones de laboratorio, fallos encontrados, issue/PR correctivo, decisión de repetición y cambios de tolerancias. No eliminar las evidencias negativas.
+
+\section{Acta de revisión}
+\noindent\textbf{Responsable de prueba:} \underline{\hspace{50mm}}\\
+\textbf{Revisor técnico:} \underline{\hspace{50mm}}\\
+\textbf{Fecha y SHA del cierre:} \underline{\hspace{55mm}}\\
+\textbf{Ubicación del video:} \underline{\hspace{75mm}}
+
+\end{document}
