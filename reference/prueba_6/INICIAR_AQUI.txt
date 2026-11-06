@@ -1,0 +1,22 @@
+RESCATE INMEDIATO — mediciones ADC reales por USB ST-LINK
+
+ATENCION: No utiliza Milk-V ni SPI; NO cumple aun esos requisitos.
+No inventa datos; rechaza tramas con CRC/error de ADC.
+
+1. Computador Debian: descomprime el ZIP.
+2. En VS Code / PlatformIO: abre la carpeta "stm32" del ZIP.
+3. STM32 conectada por USB ST-LINK: ejecuta en terminal de "stm32":
+       pio run
+       pio run -t upload
+   Si el upload custom del INI falla, usa el upload_command que YA funciono en tu equipo.
+4. Conexion entradas (maximo 3.3 V): A0 -- 10k -- 3V3; A1 -- GND.
+5. NO abrir Minicom. En la terminal del PC, desde carpeta "pc":
+       ls /dev/ttyACM*
+       sudo sh iniciar.sh /dev/ttyACM0
+   (usa otro /dev/ttyACMx si corresponde)
+6. Abre http://127.0.0.1:8080 en navegador PC.
+7. Espera la captura (~4 s). Canal 1 cerca de 3.3 V, canal 2 cerca de 0 V.
+   El preset 10000 Sa/s NO tiene garantia con polling HAL y podria mostrar error.
+
+Si NO aparece /dev/ttyACM*, no es un problema del dashboard: revisa USB ST-LINK y sus puentes VCP.
+El proyecto completo con SBC y SPI necesita corregir la comunicacion fisica.

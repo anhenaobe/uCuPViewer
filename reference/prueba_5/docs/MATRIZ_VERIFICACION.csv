@@ -1,0 +1,18 @@
+ID,Requisito,Procedimiento,Resultado esperado,Resultado experimental,Estado,Responsable,Evidencia
+V01,Alimentación y niveles,Medir GND común y 3.3V,Niveles 0-3.3V,,PENDIENTE,,Foto/medición
+V02,Compilación firmware,Ejecutar pio run,Build SUCCESS,,PENDIENTE,,Log PlatformIO
+V03,Programación MCU,Ejecutar pio run -t upload,Verify OK y reset,,PENDIENTE,,Log OpenOCD
+V04,Cableado SPI,Comparar 5 cables con tabla,Correspondencia correcta,,PENDIENTE,,Foto cables
+V05,Comunicación SPI,Ejecutar app.py --once --preset 2,Cabecera SC CRC correcto 264 bytes,,PENDIENTE,,JSON/log
+V06,Adquisición 2 canales,PA0=3.3V y PA1=GND,CH1 cercano 4095 CH2 cercano 0,,PENDIENTE,,CSV
+V07,64 muestras,Contar filas CSV,64 filas de datos,,PENDIENTE,,CSV
+V08,100 Sa/s,Seleccionar preset 1 y medir TIM2 o ADC,Periodo 10ms,,PENDIENTE,,Osciloscopio externo
+V09,1000 Sa/s,Seleccionar preset 2 y medir TIM2 o ADC,Periodo 1ms,,PENDIENTE,,Osciloscopio externo
+V10,10000 Sa/s,Seleccionar preset 3 y medir TIM2 o ADC,Periodo 100us,,PENDIENTE,,Osciloscopio externo
+V11,Integridad CRC,Corromper un byte de trama en test,Trama rechazada,,PENDIENTE,,Log tests
+V12,Dashboard SBC HTTP,Abrir http://IP_USB/,Nginx responde 200 y grafica datos,,PENDIENTE,,Captura pantalla
+V13,Refresco 0.25-1Hz,Registrar timestamps 5 capturas,Intervalo 4s nominal,,PENDIENTE,,Log timestamps
+V14,Rendimiento SPI,Medir tamaño/tiempo de SPI,Reportar bit/s efectivos,,PENDIENTE,,Tabla measurements
+V15,Reinicio automático,Reiniciar SBC y verificar systemctl,Servicio activo tras reboot,,PENDIENTE,,Log systemctl
+V16,Muestreo de señal variable,Inyectar seno 0-3.3V sin voltajes negativos,Forma esperada en ambos canales,,PENDIENTE,,Video/CSV
+V17,Frecuencia >=40000 Sa/s,No implementada por defecto,NO CUMPLIDO salvo mejora posterior,,NO_IMPLEMENTADO,,No reclamar bono

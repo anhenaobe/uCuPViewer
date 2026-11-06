@@ -1,0 +1,24 @@
+OSCILOSCOPIO STM32 + MILK-V (SIN CABLE ETHERNET)
+===============================================
+
+1) PC Debian: abrir carpeta stm32 en VS Code/PlatformIO; pio run; pio run -t upload.
+2) PC Debian: sudo minicom -D /dev/ttyUSB0 -b 115200 -8
+   Milk-V: iniciar sesion root. Cerrar Minicom con Ctrl+A, Q, sin apagar la placa.
+3) PC Debian, en la carpeta de este proyecto:
+   sudo python3 pc/instalar_uart.py --port /dev/ttyUSB0
+4) PC Debian: sudo minicom -D /dev/ttyUSB0 -b 115200 -8
+   Milk-V: sh /root/osciloscopio_final/milkv/instalar.sh
+5) Milk-V: systemctl stop osciloscopio.service
+   Milk-V: cd /root/osciloscopio_final/milkv && python3 app.py --once --preset 2
+   Milk-V: systemctl start osciloscopio.service
+6) Conectar USB-C de DATOS Milk-V-PC (ademas del UART), ver ip -br -4 addr show usb0.
+   PC Debian: configurar la interfaz USB red si hace falta y abrir http://IP_USB_MILKV/
+   Si falta Nginx, solo temporalmente: http://IP_USB_MILKV:8080/
+
+DETALLES Y COMANDOS EXACTOS EN README.md
+NO MEZCLAR ARCHIVOS DE LOS ZIP ANTERIORES.
+Pruebas en PC: python3 -m unittest discover -s tests -v
+
+Esta version es un prototipo de integracion; sin prueba en hardware no se puede
+prometer que el ADC y SPI funcionen al primer intento. Si el CRC falla el
+sistema informa error, NO dibuja muestras inventadas.
