@@ -122,42 +122,7 @@ La rama `verificationmatrix` contiene principalmente documentación de
 requisitos y verificación. No sustituye las ramas de implementación ni
 acredita automáticamente el trabajo de los demás.
 
-## 5. Registro de aportes efectivos
 
-Al finalizar, cada integrante debe documentar sus contribuciones
-**reales**, no solo su función asignada.
-
-| Integrante | Commits / PR / issues | Pruebas o documentos aportados | Estado de registro |
-|:-----------|:----------------------|:-------------------------------|:-------------------|
-| Andrew     | Por completar         | Por completar                  | Pendiente          |
-| Valeria    | Por completar         | Por completar                  | Pendiente          |
-| Sergio     | Por completar         | Por completar                  | Pendiente          |
-| Mateo      | Por completar         | Por completar                  | Pendiente          |
-| Felipe       | Por completar         | Por completar                  | Pendiente          |
-| Juan Fernando     | Por completar         | Por completar                  | Pendiente          |
-
-Cada registro final debe permitir identificar **qué hizo la persona,
-dónde está implementado y cómo se comprobó**. Las colaboraciones se
-acreditan a sus participantes reales. El uso de herramientas de IA se
-declara por separado, indicando modelo, tarea, interacción y
-verificación humana.
-
-## 6. Relación con la verificación
-
-Este documento apoya la revisión de:
-
-- `RV-17`: número de integrantes.
-- `RV-18`: responsabilidades y coordinación.
-- `RV-25`: declaración de aportes (solo cuando se complete el registro
-  real).
-- `D-DOC01`: inspección documental correspondiente.
-
-**Nota de actualización:** las guías individuales originales v0.2 se
-redactaron para Raspberry Pi y contemplaban una posible comparación con
-ESP32-S3. Esas referencias son históricas y **no describen la plataforma
-vigente**. En este proyecto se utiliza Milk-V Duo S y STM32L432KC; el
-enlace SPI por software corresponde a la configuración Linux disponible
-actualmente.
 
 ## 7. Nota sobre la evidencia actual
 
