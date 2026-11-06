@@ -1,1 +1,0 @@
-id_ensayo,id_requisito,fecha_hora_tz,responsable,tipo_evidencia,commit_firmware,commit_backend,version_sbc,preset,n_ventanas,n_pares,f_objetivo_hz,f_medida_hz,error_rel_pct,t_spi_s,sclk_hz_medida,errores,resultado_PASS_FAIL_BLOCKED_NOT_RUN,instrumento_y_calibracion,ruta_o_url_evidencia,observaciones_y_limites
