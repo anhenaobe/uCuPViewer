@@ -1,5 +1,7 @@
 # Procedimiento de recuperación y prueba controlada
 
+**Actualizaci?n posterior:** Andrew autoriz? programar la versi?n corregida; se obtuvieron tres transferencias f?sicas v?lidas. Ver [validaci?n posterior](milkv_validacion_post_systick.md). Las restricciones de programaci?n y resultados de fallo siguientes describen la sesi?n anterior.
+
 Basado en la sesión del 5 de noviembre de 2026. Resultado de referencia:
 [USB recuperado](milkv_usb_diagnostico.md), [SPI bloqueado por SysTick](milkv_spi_diagnostico.md).
 No flashear la variante local hasta resolver su diferencia con la versión instalada.

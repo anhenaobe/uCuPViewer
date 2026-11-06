@@ -46,9 +46,10 @@ python -B tests/milkv_uart/test_protocol_offline.py
 ```
 La rama de diagnóstico añade el handler SysTick que faltaba al firmware importado.
 El [diagnóstico físico](docs/debug/milkv_spi_diagnostico.md) registra el bloqueo
-en la STM32 conectada y las pruebas reales de recepción de ceros. El binario instalado
-es distinto del proyecto local; la corrección no se ha flasheado. No seguir instrucciones
-originales de programación sin resolver esa correspondencia. Compilar no valida SPI.
+en la STM32 conectada y las pruebas iniciales de recepción de ceros. Con autorización
+de Andrew se programó la versión corregida: [tres transferencias físicas válidas](docs/debug/milkv_validacion_post_systick.md)
+con CRC y secuencias consecutivas. La imagen anterior se conserva respaldada.
+Las tasas ADC y tensiones de entrada siguen pendientes de validación.
 
 Repositorio: [anhenaobe/uCuPViewer](https://github.com/anhenaobe/uCuPViewer).
 Desarrollo por ramas/PR hacia main, sin sobrescribir aportes ni alterar PASS/FAIL

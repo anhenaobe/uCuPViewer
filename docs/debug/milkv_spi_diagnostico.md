@@ -1,4 +1,6 @@
-﻿# Diagnóstico SPI — 5 de noviembre de 2026
+# Diagnóstico SPI — 5 de noviembre de 2026
+
+**Actualizaci?n posterior:** Andrew autoriz? programar la versi?n corregida; se obtuvieron tres transferencias f?sicas v?lidas. Ver [validaci?n posterior](milkv_validacion_post_systick.md). Las restricciones de programaci?n y resultados de fallo siguientes describen la sesi?n anterior.
 
 ## Resultado y límites
 
