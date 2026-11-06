@@ -1,3 +1,5 @@
+NOTA DE VIGENCIA 2026-11-05: documento de planificación anterior. Milk-V reemplaza definitivamente a Raspberry Pi en el montaje; SPI convencional Milk-V no disponible, se usa GPIO. La implementación actual es SC264 y ADC polling: ver docs/architecture/estado_actual.md, docs/protocol/frame_sc.md y docs/protocol/spi_software.md. La revisión de este contrato/plan requiere Andrew, Pipe, Ferxxo y Checho; no se imponen268 B ni DMA al desarrollo actual. Contenido previo conservado a continuación para trazabilidad.
+
 ANDREW - COORDINACIÓN TÉCNICA, GITHUB Y FIRMWARE STM32
 Estado: plan de trabajo futuro; esta tarea no implementa firmware.
 

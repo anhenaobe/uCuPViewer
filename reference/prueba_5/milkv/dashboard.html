@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Osciloscopio · Milk-V + STM32</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#142239;--ink:#eaf2ff;--muted:#aabed8;--c1:#6ee7bb;--c2:#fbbf73;--grid:#36506b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,Segoe UI,sans-serif;color:var(--ink)}
+main{max-width:1320px;margin:auto;padding:24px}h1{font-size:26px;margin:0}header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+small,.muted{color:var(--muted)}.panel{background:var(--panel);padding:18px;border-radius:16px;border:1px solid #2d405c;margin-bottom:15px}
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px}.controls button,.controls select{background:#243854;border:1px solid #506a8b;color:var(--ink);border-radius:8px;padding:9px 12px;font-size:15px;cursor:pointer}
+.controls button:hover{background:#35547d}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px;margin-bottom:15px}
+.stat{background:var(--panel);border:1px solid #2d405c;border-radius:11px;padding:12px}.stat strong{font-size:23px;display:block;font-variant-numeric:tabular-nums}
+.plot{width:100%;display:block;aspect-ratio:3.2/1;background:#0e1a2c;border-radius:9px}h2{font-size:17px;margin:0 0 8px}.legend{display:flex;gap:18px;flex-wrap:wrap}
+.key{display:inline-block;width:10px;height:10px;border-radius:10px;margin-right:5px}.c1{background:var(--c1)}.c2{background:var(--c2)}
+#error{color:#ffb5b5;white-space:pre-wrap}#status{font-weight:700}a{color:#a7d6fc}footer{padding:12px 0;color:var(--muted)}
+@media(max-width:600px){main{padding:12px}.plot{aspect-ratio:1.6/1}h1{font-size:22px}}
+</style></head><body><main>
+<header><div><h1>Osciloscopio · Sistema híbrido</h1><small>STM32L432KC · ADC1 + TIM2/DMA · GPIO SPI · Milk-V Duo S · Nginx</small></div><div id="status">INICIANDO</div></header>
+<section class="panel controls"><label for="preset">Frecuencia de muestreo</label><select id="preset"><option value="1">100 Sa/s</option><option value="2" selected>1.000 Sa/s</option><option value="3">10.000 Sa/s</option></select><button id="apply">Aplicar por SPI</button><a href="/api/csv">Descargar captura CSV</a><small>Refresco: cada 4 segundos (0,25 Hz)</small></section>
+<section class="stats"><div class="stat"><small>Frecuencia capturada</small><strong id="rate">—</strong></div><div class="stat"><small>Ventana por canal</small><strong id="size">—</strong></div><div class="stat"><small>Transferencia SPI</small><strong id="elapsed">—</strong></div><div class="stat"><small>Tasa efectiva SPI</small><strong id="bps">—</strong></div><div class="stat"><small>Secuencia ADC</small><strong id="seq">—</strong></div><div class="stat"><small>Capturas válidas / errores</small><strong id="counts">0 / 0</strong></div></section>
+<section class="panel"><h2 style="color:var(--c1)">Canal 1 — PA0 / A0</h2><canvas id="canvas1" class="plot" width="1100" height="345" aria-label="Gráfico del canal 1"></canvas></section>
+<section class="panel"><h2 style="color:var(--c2)">Canal 2 — PA1 / A1</h2><canvas id="canvas2" class="plot" width="1100" height="345" aria-label="Gráfico del canal 2"></canvas></section>
+<section class="panel"><div class="legend"><span><i class="key c1"></i>A0 / PA0</span><span><i class="key c2"></i>A1 / PA1</span><span>ADC 12 bits, 0–4095, voltajes referidos a 3,3 V nominales</span></div><div id="error" role="alert"></div><small id="updated"></small></section>
+<footer>Si una trama SPI tiene errores de cabecera, CRC o ADC, se ocultan las muestras inválidas. No hay simulación en este dashboard.</footer>
+</main><script>
+'use strict';
+const byId=(id)=>document.getElementById(id);
+function plot(id,data,color){
+ const canvas=byId(id),ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#0e1a2c';ctx.fillRect(0,0,W,H);
+ const L=65,R=20,T=18,B=42,pw=W-L-R,ph=H-T-B;
+ ctx.font='15px system-ui';ctx.textAlign='right';ctx.lineWidth=1;
+ for(let i=0;i<=6;i++){
+  const y=T+(i/6)*ph,volts=3.3*(1-i/6);
+  ctx.strokeStyle='#36506b';ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(W-R,y);ctx.stroke();
+  ctx.fillStyle='#aabed8';ctx.fillText(volts.toFixed(2)+' V',L-10,y+5);
+ }
+ ctx.textAlign='center';
+ const last=data.length ? data[data.length-1].t : 1;
+ for(let i=0;i<=5;i++) {let x=L+pw*i/5;ctx.strokeStyle='#243a54';ctx.beginPath();ctx.moveTo(x,T);ctx.lineTo(x,H-B);ctx.stroke();ctx.fillStyle='#aabed8';ctx.fillText((last*i/5*1000).toFixed(1)+' ms',x,H-14);}
+ if(!data.length){ctx.font='20px system-ui';ctx.fillStyle='#aabed8';ctx.fillText('Esperando trama ADC válida',W/2,H/2);return;}
+ ctx.beginPath();ctx.lineWidth=3;ctx.strokeStyle=color;
+ data.forEach((sample,i)=>{let x=L+pw*(data.length===1?0:i/(data.length-1));let y=T+ph*(1-Math.max(0,Math.min(3.3,sample))/3.3);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();
+}
+function blank(){plot('canvas1',[],'#6ee7bb');plot('canvas2',[],'#fbbf73');}
+async function tick(){
+ try{
+  const r=await fetch('/api/state',{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);
+  const s=await r.json();byId('status').textContent=s.ok?'DATOS VÁLIDOS':'SIN DATOS VÁLIDOS';byId('status').style.color=s.ok?'#6ee7bb':'#ffb5b5';
+  byId('rate').textContent=s.rate_hz?(s.rate_hz.toLocaleString('es-CO')+' Sa/s'):'—';
+  byId('size').textContent=s.ok?s.samples.length+' muestras':'—';byId('elapsed').textContent=s.transfer_s==null?'—':s.transfer_s+' s';
+  byId('bps').textContent=s.effective_bps==null?'—':s.effective_bps+' bit/s';byId('seq').textContent=s.ok?s.sequence:'—';
+  byId('counts').textContent=s.success_count+' / '+s.error_count;byId('error').textContent=s.error?'Error: '+s.error:'';
+  byId('updated').textContent=s.last_update?'Última adquisición: '+new Date(s.last_update*1000).toLocaleString('es-CO'):'';
+  if(s.ok){plot('canvas1',s.samples.map(x=>x.ch1),'#6ee7bb');plot('canvas2',s.samples.map(x=>x.ch2),'#fbbf73');}else blank();
+ }catch(e){byId('status').textContent='SERVIDOR DESCONECTADO';byId('error').textContent=e.message;blank();}
+}
+byId('apply').addEventListener('click',async()=>{
+ const p=Number(byId('preset').value);try{let r=await fetch('/api/preset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({preset:p})});if(!r.ok)throw Error('HTTP '+r.status);byId('error').textContent='Preset solicitado. Se aplica tras concluir la siguiente transacción SPI.';}catch(e){byId('error').textContent='Error al cambiar preset: '+e.message;}
+});blank();tick();setInterval(tick,4000);
+</script></body></html>

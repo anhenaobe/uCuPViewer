@@ -1,0 +1,15 @@
+[Unit]
+Description=Osciloscopio Milk-V SPI GPIO, HTTP backend
+After=local-fs.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/osciloscopio_final/milkv
+ExecStartPre=/bin/sh /root/osciloscopio_final/milkv/preparar_gpio.sh
+ExecStart=/usr/bin/python3 /root/osciloscopio_final/milkv/app.py --host 0.0.0.0 --port 8080
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+.pio/
+__pycache__/
+*.pyc
+*.o
+*.elf
+*.bin
+*.hex
+milkv/spi_master
+captura.csv
+.DS_Store

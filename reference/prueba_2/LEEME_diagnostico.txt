@@ -1,0 +1,10 @@
+PRUEBA STM32 + MILK-V - DIAGNOSTICO
+
+1) En computador Debian: copiar main_stm32_spi_adc_diagnostico.c a src/main.c del proyecto PlatformIO nucleo_l432kc. Mantener platformio.ini que ya funciono. Ejecutar pio run -t upload.
+2) En Milk-V: en /root/osciloscopio/spi/ reemplazar osc_spi.py por osc_spi_diagnostico.py (copiar el contenido con nano o transferir via SSH).
+3) Minicom: sudo minicom -D /dev/ttyUSB0 -b 115200 -8 desde el computador. En Milk-V: ./preparar_gpio.sh.
+4) Ejecutar python3 osc_spi_diagnostico.py 2. Primera lectura esperada: cabecera 53 43 02 F0 (indica SPI disponible).
+5) Esperar >1 segundo y ejecutar nuevamente python3 osc_spi_diagnostico.py 2. Esperado: cabecera 53 43 02 00 y lecturas ADC en rango 0..4095.
+6) Si codigo en cuarto byte: 10 ADC init; 11 calibracion; 12 timer; 13 configurar canal; 14 ADC start; 15 espera ADC; 16 espera timer.
+
+El SPI bit-bang sigue siendo lento (~1.4 s por trama). Captura con TIM2 y conversiones secuenciales por polling: NO es la implementacion final con ADC+DMA y muestreo preciso a 10 kSa/s.

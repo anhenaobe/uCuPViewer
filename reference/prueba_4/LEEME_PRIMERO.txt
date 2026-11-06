@@ -1,0 +1,52 @@
+OSCILOSCOPIO STM32 + MILK-V + PC POR USB-UART (SIN ETHERNET)
+==========================================================
+
+Estructura:
+  stm32_platformio/src/main.c      -> Firmware de la NUCLEO-L432KC
+  stm32_platformio/platformio.ini -> Ejemplo de configuracion PlatformIO
+  pc/pc_dashboard_uart_v2.py      -> Programa para ejecutar en el PC Debian
+  pc/milkv_stream.py              -> Script enviado por UART a la Milk-V
+  pc/dashboard.html               -> Dashboard HTTP en el PC
+  milkv/preparar_gpio.sh          -> Configuracion GPIO en la Milk-V
+
+1) PLACA STM32
+   Si ya tienes un proyecto PlatformIO que carga bien, conserva SU platformio.ini.
+   Reemplaza SOLO src/main.c por stm32_platformio/src/main.c.
+   Desde VS Code, terminal del proyecto: pio run -t upload
+   Este firmware implementa SPI modo 0 mediante GPIO, no SPI1 hardware.
+
+2) CABLES, CON PLACAS APAGADAS
+   Milk-V GPIO461/B13/J3-19 -> STM32 PB5/D11 (MOSI)
+   Milk-V GPIO462/B14/J3-21 <- STM32 PB4/D12 (MISO)
+   Milk-V GPIO463/B15/J3-23 -> STM32 PB3/D13 (SCK)
+   Milk-V GPIO464/B16/J3-24 -> STM32 PA4/A3 (CS)
+   Milk-V GND -> STM32 GND
+   Para prueba analogica: STM32 3V3 -- resistencia 10k -- A0;
+                         STM32 A1 -- GND.
+   NO aplicar señales negativas ni superiores a 3.3 V.
+
+3) MILK-V DESDE MINICOM (EN EL PC)
+   sudo minicom -D /dev/ttyUSB0 -b 115200 -8
+   Inicia sesion como root. En la consola de la Milk-V:
+   cd ~/osciloscopio/spi
+   ./preparar_gpio.sh
+   El archivo ya existe en tu Milk-V. Si no existe, copiar el del directorio milkv.
+   Sal de Minicom con Ctrl+A, luego Q. DEJA LA SESION root INICIADA.
+   No dejes Minicom abierto al ejecutar el dashboard.
+
+4) PC, TERMINAL NORMAL (NO DENTRO DE MINICOM)
+   cd /ruta/a/osciloscopio_uart_organizado/pc
+   sudo python3 pc_dashboard_uart_v2.py --serial /dev/ttyUSB0
+   Abrir http://127.0.0.1:8080
+   Para detener: Ctrl+C. Se puede volver a abrir Minicom.
+
+IMPORTANTE
+   - No necesitas copiar dashboard.html ni milkv_stream.py a la Milk-V.
+   - Los tres archivos dentro de pc deben estar juntos.
+   - El dashboard HTTP se ejecuta en el PC, NO en la Milk-V.
+   - Version experimental NO validada en hardware por este asistente.
+   - La velocidad efectiva del SPI GPIO y el muestreo 10k Sa/s requieren medicion.
+   - Si sale 'Sin respuesta SCOPE_UID:0', no es fallo de main.c;
+     revisar consola root y liberacion del puerto UART tras salir de Minicom.
+   - Prueba visual sin hardware: python3 pc_dashboard_uart_v2.py --demo
+     (muestra DEMO SIMULADA, NO mediciones reales).
