@@ -95,3 +95,30 @@ persiste un proceso, identificarlo antes de iniciar otro. Cerrar después el tú
 y eliminar la regla milkv-debug-ssh como indica el procedimiento de recuperación.
 Los archivos de /tmp no son instalación persistente: el código fuente y las
 instrucciones quedan versionados y respaldados en el PC.
+
+## Recuperaciones posteriores observadas
+
+Tras desconectar y reconectar el USB, VirtualBox perdió la asignación del
+Prolific. Se reasignó el dispositivo 067B:2303 a vmmm; su symlink estable pasó
+a apuntar a ttyUSB1. El proceso anterior seguía ocupando HTTP y conservaba un
+descriptor UART inválido. SIGINT no terminó ese proceso lanzado en segundo plano;
+se verificó su identidad y se terminó con SIGTERM. Se envió Q al capturador remoto,
+se comprobó el prompt root y se inició una sola instancia nueva del puente.
+PID observado después de recuperar: 3623; log dashboard-recovered.log en la
+misma carpeta temporal. La API volvió a indicar hardware/valid=true, 64 muestras,
+secuencia 279. No reutilizar números PID sin comprobar el comando actual.
+
+En otra incidencia el USB permanecía conectado y HTTP respondía, pero STM32
+reportó 0x17. La configuración solicitada/medida era preset 3, 10000 Sa/s. Se
+restauró el preset 2 por la API existente:
+
+```powershell
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:18080/api/preset -ContentType 'application/json' -Body '{"preset":2}'
+```
+
+Después se confirmó status=ok, valid=true, source=hardware, preset solicitado y
+medido 2, 1000 Sa/s nominales, 64 muestras, secuencia 370 y error=null; página
+HTTP 200. No se modificó firmware ni señal de entrada. El error 0x17 corresponde
+a periodo perdido durante la adquisición polling, no demuestra desconexión USB.
+La operación a 10000 Sa/s sigue sin validación de estabilidad. Si HTTP funciona,
+consultar primero /api/state antes de reiniciar todo.
