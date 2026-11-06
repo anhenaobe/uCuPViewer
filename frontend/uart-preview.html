@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101820">
+  <title>uCuPViewer · UART experimental</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./uart-preview.css">
+  <script type="module" src="./src/uart-preview.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">uV</span><span>uCuPViewer</span></a>
+    <span class="course-label">Prueba UART local, independiente de la API HTTP</span>
+  </header>
+  <main class="dashboard">
+    <section class="page-heading">
+      <div>
+        <p class="eyebrow">LABORATORIO DE FRONTEND</p>
+        <h1>Monitor UART experimental</h1>
+        <p class="intro">Raspberry Pi hipotéticamente preparada · 115200 baudios · 8N1</p>
+      </div>
+      <span class="source-badge" data-source="simulated">Sin mediciones verificadas</span>
+    </section>
+    <section class="notice">
+      <span class="notice-icon" aria-hidden="true">i</span>
+      <p>No modifica el contrato HTTP ni demuestra comunicación física. Esta página solo accede a puertos conectados al computador que ejecuta el navegador. El formato JSON por línea es una propuesta experimental, no un acuerdo con Pipe.</p>
+    </section>
+    <section class="uart-toolbar" aria-label="Conexión UART">
+      <div>
+        <h2 id="uart-state" role="status" aria-live="polite">Preparando…</h2>
+        <p id="uart-detail">Sin verificación de puerto físico.</p>
+      </div>
+      <div class="uart-actions">
+        <button id="uart-connect" type="button">Elegir puerto UART</button>
+        <button id="uart-disconnect" type="button" disabled>Desconectar</button>
+      </div>
+    </section>
+    <dl class="uart-metrics">
+      <div><dt>Configuración provisional</dt><dd>115200 baudios · 8N1</dd></div>
+      <div><dt>Bytes recibidos</dt><dd id="uart-bytes">0</dd></div>
+      <div><dt>Ventanas JSON válidas</dt><dd id="uart-frames">0</dd></div>
+    </dl>
+    <p class="error-message" id="uart-error" role="alert" hidden></p>
+    <p class="uart-placeholder" id="uart-placeholder">Todavía no hay ventana recibida. No se dibujan señales inventadas.</p>
+    <section id="uart-charts" hidden>
+      <p id="uart-samples" class="uart-info"></p>
+      <p id="uart-source" class="uart-info"></p>
+      <div class="plots-grid">
+        <figure class="plot-card"><figcaption><span class="channel-key channel-one"></span><strong>CH1 · Cuentas ADC</strong></figcaption><svg class="waveform-plot" id="uart-plot-ch1" role="img" aria-label="CH1 recibido por puerto serial"></svg></figure>
+        <figure class="plot-card"><figcaption><span class="channel-key channel-two"></span><strong>CH2 · Cuentas ADC</strong></figcaption><svg class="waveform-plot" id="uart-plot-ch2" role="img" aria-label="CH2 recibido por puerto serial"></svg></figure>
+      </div>
+    </section>
+    <footer class="page-footer"><span>Modo experimental local · No es el dashboard de producción</span><span>El frontend principal sigue en <a href="./">inicio</a></span></footer>
+  </main>
+</body>
+</html>
