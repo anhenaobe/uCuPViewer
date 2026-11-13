@@ -1,0 +1,34 @@
+REVISIÓN DEL ESQUELETO uCuPViewer.zip - 2026-10-23
+
+ORIGEN: ZIP suministrado por el docente. Los hallazgos siguientes corresponden al contenido inspeccionado; las propuestas de adaptación se indican aparte.
+
+1. CONTENIDO OBSERVADO
+- src/C/: versión con pthreads, SyncFrame, DaqBuffer y funciones daq, renderer, fast_copy, display_frame.
+- src/CPP/: versión análoga en C++ (std::thread, mutex, condition_variable y buffers con vector).
+- src/Rust/: versión análoga en Rust (thread, Arc, Mutex, Condvar).
+- doc/architecture/: diagrama draw.io y PNG.
+- El ZIP también contenía carpetas .git internas y archivos compilados; se excluyen de la referencia conservada para no importar historia o binarios de terceros.
+- El diagrama presenta DAQ Process → Capture Buffer → Renderer → Frame Buffer → Copy Process → Frame Buffer (copy) → Display Driver. Indica que el DAQ se distribuye entre microprocesador y microcontrolador.
+
+2. FUNCIONALIDAD QUE NO ESTÁ IMPLEMENTADA EN LOS ARCHIVOS REVISADOS
+- Las funciones private_daq_function solo imprimen mensajes; no llenan con muestras reales los buffers.
+- No se implementan transacciones SPI ni configuración de la frecuencia de muestreo del microcontrolador.
+- No hay código de ADC/firmware en el ZIP.
+- Las funciones de render y display son placeholders de consola; no hay servidor HTTP Nginx/Apache ni API web.
+- Los periodos fijos 500 ms DAQ, 700 ms renderer y 1 s display NO equivalen a los presets de 100/1.000/10.000 Sa/s. Esos presets deben estar en el uC.
+
+3. PROBLEMAS A REVISAR ANTES DE ADAPTAR
+- C++/main.cpp: define fast_copy_thread pero NO crea ese hilo; el diagrama sí incluye Copy Process.
+- C++/renderer.cpp: sleep de 700 ms mientras mantiene los dos mutex; el bloqueo impide que DAQ actualice el buffer durante ese intervalo.
+- C++/main.cpp: manejador de SIGINT utiliza std::cout, notify_all y std::exit en contexto de señal, con problemas de seguridad de señal/limpieza. El comentario de terminación graceful es engañoso.
+- Rust/renderer.rs: también duerme con los mutex tomados.
+- C/main.c: punteros de datos NULL inicialmente, sin buffers de captura/frame realmente asignados; el código del placeholder no opera sobre datos reales.
+- C, C++ y Rust: copia rápida en bucle continuo o estructura prevista para ello. Debe decidirse si el backend HTTP necesita frames de píxeles o si basta con entregar muestras JSON al cliente que las dibuja en el navegador.
+- Requisitos de temporización, cierre ordenado, formato de ventanas, control de errores, validación y montaje siguen abiertos.
+
+4. DECISIÓN DE ADAPTACIÓN (PROPUESTA)
+- Preservar referencia del docente SIN cambios en reference/profesor/.
+- Recomendar un solo lenguaje principal para backend del SBC (C++17 se alinea con la versión del esqueleto, pero confirmar con profesor/equipo).
+- Mantener la idea del DAQ separado y sincronización por condición, si resulta útil; NO copiar acríticamente render/copy/display porque el dashboard estará en navegador con HTTP.
+- Mostrar evidencias de cómo el diseño derivado respeta la intención de concurrencia e interfaces E/S del docente.
+- No prometer que la versión adaptada compila o funciona antes de pruebas.
