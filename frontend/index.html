@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1220">
+  <title>uCuPViewer · Osciloscopio</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+  <style>
+    :root { color-scheme: dark; font: 16px/1.5 system-ui, sans-serif; background: #0b1220; color: #e5edf8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: clamp(1rem, 4vw, 3rem); }
+    main { max-width: 1100px; margin: auto; }
+    header, .toolbar, .status-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    h1 { margin: 0; font-size: clamp(1.5rem, 4vw, 2.25rem); }
+    .muted { color: #9aacc4; }
+    .card { margin-top: 1.25rem; padding: 1.25rem; border: 1px solid #26354b; border-radius: 16px; background: #111c2d; }
+    .toolbar { justify-content: flex-start; }
+    button, select { color: inherit; background: #1b2a40; border: 1px solid #40536d; border-radius: 8px; padding: .6rem .85rem; font: inherit; }
+    button { cursor: pointer; } button[aria-pressed="true"] { background: #155e75; border-color: #22d3ee; }
+    .badge { padding: .25rem .65rem; border-radius: 999px; background: #854d0e; color: #fde68a; font-weight: 700; }
+    .chart-wrap { position: relative; height: min(55vh, 430px); min-height: 260px; }
+    #message { min-height: 1.5em; color: #fca5a5; }
+    @media (max-width: 600px) { body { padding: 1rem; } .card { padding: .85rem; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div><h1>uCuPViewer</h1><div class="muted">Visualizador de dos canales ADC</div></div>
+      <span class="badge" id="source-badge">SIMULACIÓN</span>
+    </header>
+    <section class="card" aria-label="Controles de adquisición">
+      <div class="toolbar" id="presets" aria-label="Preset de muestreo">
+        <strong>Frecuencia por canal:</strong>
+        <button data-rate="100" aria-pressed="false">100 Sa/s</button>
+        <button data-rate="1000" aria-pressed="true">1 kSa/s</button>
+        <button data-rate="10000" aria-pressed="false">10 kSa/s</button>
+        <label for="refresh">Refresco:</label>
+        <select id="refresh"><option value="1000">1 s</option><option value="2000" selected>2 s</option><option value="3000">3 s</option><option value="4000">4 s</option></select>
+      </div>
+      <p class="status-row"><span id="status">Iniciando…</span><span id="rate-label">1 kSa/s por canal</span></p>
+      <div class="chart-wrap"><canvas id="waveform" aria-label="Gráfica de CH1 y CH2"></canvas></div>
+      <p class="muted">Datos RAW simulados (0–4095); la simulación no demuestra comunicación con el STM32.</p>
+      <p id="message" role="status"></p>
+    </section>
+  </main>
+</body>
+</html>
