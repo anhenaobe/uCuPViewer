@@ -88,9 +88,8 @@ No timeout automático de captura: el cliente puede abortar mediante stop si DMA
 termina. ERROR actualmente identifica fallo genérico; diagnóstico detallado se consulta
 en handles HAL con debugger. No streaming ni doble buffer. Futuro SPI debe respetar
 la propiedad de la ventana, separar READY ADC de TX y acordar pines y tiempos.
-La integración SPI de este firmware aún no existe. La documentación de proyecto debe
-mantener separadas la evidencia de adquisición ya registrada y las verificaciones
-físicas de cadencia/señales que continúan pendientes.
+La documentación compartida aún describe firmware no creado; proponer su actualización
+por separado al revisar este hito, sin modificarla aquí.
 
 ## Referencias
 - RM0394: https://www.st.com/resource/en/reference_manual/rm0394-stm32l41xxx42xxx43xxx44xxx45xxx46xxx-advanced-armbased-32bit-mcus-stmicroelectronics.pdf

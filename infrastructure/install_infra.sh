@@ -49,7 +49,7 @@ backend_port=$((10#$backend_port))
 
 log "Installing Nginx and Python spidev package."
 apt-get update
-DEBIAN_FRONTEND=noninteractive apt-get install -y nginx python3-spidev python3-venv
+DEBIAN_FRONTEND=noninteractive apt-get install -y nginx python3-spidev
 
 log "Enabling SPI in ${boot_config} (a reboot may be required)."
 backup="${boot_config}.ucupviewer.$(date +%Y%m%d%H%M%S).bak"
@@ -105,8 +105,6 @@ install -m 0640 "${SCRIPT_DIR}/spi_protocol.py" "${APP_ROOT}/backend/spi_protoco
 chown -R root:"$SERVICE_USER" "${APP_ROOT}/backend"
 find "${APP_ROOT}/backend" -type d -exec chmod 0750 {} +
 find "${APP_ROOT}/backend" -type f -exec chmod 0640 {} +
-python3 -m venv --system-site-packages "${APP_ROOT}/venv"
-"${APP_ROOT}/venv/bin/pip" install --disable-pip-version-check -r "${APP_ROOT}/backend/requirements.txt"
 
 install -d -o root -g root -m 0755 "$WEB_ROOT"
 if [[ -d "${REPO_ROOT}/frontend" ]]; then

@@ -1,12 +1,7 @@
-<<<<<<< Updated upstream
 ACTUALIZACIÓN 2026-11-05: desarrollo real y restricciones en docs/architecture/estado_actual.md. SC264 y polling son la implementación actual; los planes ADC+DMA/contrato v0.2 siguientes son antecedentes, no sustituciones autorizadas.
 
 FERXXO - MILK-V, HTTP, DESPLIEGUE Y APOYO SPI
 Estado: plan futuro; no hay servicios integrados ni tasas SPI demostradas.
-=======
-FERXXO - RASPBERRY PI, HTTP, DESPLIEGUE Y APOYO SPI
-Estado: backend y frontend de demostración, plantillas de infraestructura y protocolo SPI candidato integrados en el árbol local; aún no desplegados en Raspberry Pi ni hay tasas SPI físicas demostradas.
->>>>>>> Stashed changes
 
 1. OBJETIVO
 Preparar un entorno Milk-V (modelo físico por confirmar) reproducible para SPI y acceso HTTP en red.
@@ -15,19 +10,13 @@ Modelo confirmado: Milk-V (modelo físico por confirmar). Identificar sistema op
 3. ENTRADAS NECESARIAS
 Valeria: montaje/pinout/límites. Andrew/Pipe: protocolo y necesidades de acceso. Mateo: recursos web. Checho: metodología e instrumentos.
 4. SALIDAS
-Plan de despliegue, instalador, configuración Nginx/systemd, transporte SPI candidato y plantilla de resultados integrados. El inventario real de la Pi, el despliegue, diagnóstico y evidencias físicas/de red siguen pendientes.
+Inventario y plan de despliegue; en futuras tareas, instrucciones/scripts reproducibles, configuración HTTP y arranque, diagnóstico y evidencias de red/SPI con versiones.
 5. CONTRATOS A RESPETAR
 docs/03_contratos_interfaces_v0_2.txt para SPI/HTTP y docs/06_flujo_git.txt para aportes. No sustituir servidor HTTP requerido por servidor de desarrollo. READY, espaciado y ACK deben acordarse, no asumirse operativos.
 6. ACTIVIDADES SIN ESPERAR
-<<<<<<< Updated upstream
 Inventariar Milk-V/OS, revisar documentación oficial, proponer diagrama de despliegue y checklist de red/permisos. Esta tarea no instala ni configura servicios ni implementa scripts.
 7. ENTREGABLES Y ACEPTACIÓN
 Futuros PR con puesta en marcha reproducible en Milk-V documentada, dashboard accesible desde otra máquina, servicios que arrancan tras reinicio y límites SPI medidos. No afirmar funcionamiento por tener archivos de configuración.
-=======
-Mantener las plantillas y checklist coherentes con las dependencias del backend/frontend; coordinar puerto y entrypoint con Pipe, rutas con Mateo, pinout con Valeria/Andrew y medidas con Checho. No tratar simulaciones como evidencia física ni cambiar estados de pruebas sin resultados observados.
-7. ENTREGABLES Y ACEPTACIÓN
-La rama incluye ya los archivos reproducibles de preparación. Quedan por completar el despliegue en Pi, dashboard accesible desde otra máquina, arranque tras reinicio y límites SPI medidos; la existencia de archivos de configuración no demuestra funcionamiento.
->>>>>>> Stashed changes
 8. PRUEBAS A EJECUTAR O APOYAR
 V07/V08 con Checho (máximos teóricos de ambos extremos y SCLK real), V11, V15/V16 y repetibilidad de despliegue en V17. Separar teoría, payload ideal y tiempo completo medido.
 9. DEPENDENCIAS
